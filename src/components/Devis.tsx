@@ -339,7 +339,7 @@ const Devis = () => {
 
   const renderTable = (data: any[]) => (
     // <div className="table-responsive" >
-    <div className="position-absolute table-responsive1">
+<div className={loading ? "container" : "position-absolute table-responsive1"}>
       {loading ? (
         <div className="text-center py-4">
           <div className="spinner-border text-primary" role="status">

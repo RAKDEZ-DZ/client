@@ -871,9 +871,9 @@ const Voyages = () => {
           <div className="mb-4">
             <div className="d-flex justify-content-between flex-wrap">
               <h2 className="fw-bold mb-1">Gestion des Voyages</h2>
-              <button className="btn fw-semibold" data-bs-toggle="modal" data-bs-target="#voyageModal"
+              <button className="btn fw-semibold text-light" data-bs-toggle="modal" data-bs-target="#voyageModal"
                 style={{ backgroundColor: "#00AEEF" }}>
-                + voyage
+                nouveau voyage
               </button>
             </div>
             <div className="d-flex flex-column w-md-auto my-3">
@@ -1544,11 +1544,11 @@ const Voyages = () => {
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                  {selectedVoyage && (
+                  {/* {selectedVoyage && (
                     <button type="button" className="btn btn-primary">
                       <i className="fas fa-print me-1"></i> Imprimer
                     </button>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
