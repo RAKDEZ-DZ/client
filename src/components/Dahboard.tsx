@@ -362,7 +362,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleTravelChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleTravelChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setTravelData(prev => ({
       ...prev,

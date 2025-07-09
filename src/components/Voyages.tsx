@@ -95,7 +95,7 @@ type DossierVoyage = {
 
 // Type pour le formulaire d'ajout/modification de dossier de voyage
 type TravelFormData = {
-  client_id: number;  // Revenir à l'ID client pour la sélection dans le dropdown
+  client_id: number;  
   type_voyage: string;
   destination: string;
   date_depart: string;
@@ -158,12 +158,12 @@ const Voyages = () => {
   const validateForm = (): boolean => {
     const newErrors: Partial<TravelFormData> = {};
 
-    if (!travelFormData.client_id) newErrors.client_id = "Client requis";
+    // if (!travelFormData.client_id) newErrors.client_id = "Client requis";
     if (!travelFormData.type_voyage) newErrors.type_voyage = 'Type de voyage requis';
     if (!travelFormData.destination) newErrors.destination = 'Destination requise';
     if (!travelFormData.date_depart) newErrors.date_depart = 'Date de départ requise';
     if (!travelFormData.motif_voyage) newErrors.motif_voyage = 'Motif du voyage requis';
-    if (!travelFormData.prix_total) newErrors.prix_total = "Prix total requis";
+    // if (!travelFormData.prix_total) newErrors.prix_total = "Prix total requis";
 
     console.log('Erreurs de validation:', newErrors);
     setErrors(newErrors);

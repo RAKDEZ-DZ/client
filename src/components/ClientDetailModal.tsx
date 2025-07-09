@@ -302,7 +302,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, onClose }
                                           // Créer un lien temporaire pour télécharger le fichier
                                           const a = document.createElement('a');
                                           a.href = blobUrl;
-                                          a.download = doc.name || doc.originalname || doc.filename || 'document';
+                                          a.download = doc.name || doc.originalName  || doc.filename || 'document';
                                           document.body.appendChild(a);
                                           a.click();
                                           

@@ -289,7 +289,7 @@ const Clients = () => {
           } else {
             console.warn('Les données ne sont pas un tableau mais un objet:', response.data);
             // Tenter de convertir l'objet en tableau si possible
-            const clientsArray = Object.values(response.data);
+            const clientsArray = Object.values(response.data) as ClientType[];;
             if (clientsArray.length > 0 && typeof clientsArray[0] === 'object') {
               console.log('Conversion de l\'objet en tableau:', clientsArray);
               setClients(clientsArray);

@@ -720,8 +720,7 @@ const Devis = () => {
           },
         };
         
-        // Générer le PDF
-        html2pdf()
+        (html2pdf() as any)
           .from(pdfContainer)
           .set(opt)
           .outputPdf('blob')
