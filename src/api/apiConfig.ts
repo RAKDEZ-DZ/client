@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env?.VITE_API_URL || 'http://192.168.0.47:3000';
+const API_URL = import.meta.env?.VITE_API_URL || 'https://backend1-lz19.onrender.com';
 
 const apiClient = axios.create({
   baseURL: API_URL,

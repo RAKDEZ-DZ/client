@@ -7,7 +7,7 @@ import "../App.css";
 
 // Configuration de l'API
 const API = axios.create({
-  baseURL: 'http://192.168.0.47:3000', // URL du backend
+  baseURL: 'https://backend1-lz19.onrender.com', // URL du backend
   headers: {
     'Content-Type': 'application/json'
   }

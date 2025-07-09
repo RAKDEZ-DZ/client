@@ -7,7 +7,7 @@ import '../App.css';
 // Détection de l'environnement pour l'URL de l'API
 const getAPIBaseURL = () => {
   // Utiliser l'adresse IP spécifiée
-  return 'http://192.168.0.47:3000';
+  return 'https://backend1-lz19.onrender.com';
 };
 
 // Configuration de l'API
