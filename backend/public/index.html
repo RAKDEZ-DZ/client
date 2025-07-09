@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oussama Travel - Connexion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1200px;
+            width: 100%;
+            margin: 20px;
+        }
+
+        .login-section {
+            flex: 1;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .admin-section {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 40px;
+            display: none;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .user-info {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .permissions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .permission-badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .users-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .user-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        .user-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-actions button {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 10px;
+            }
+            
+            .login-section, .admin-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Section de connexion -->
+        <div class="login-section" id="loginSection">
+            <div class="logo">
+                <h1>🛫 Oussama Travel</h1>
+                <p>Système de gestion</p>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required value="admin@oussamatravel.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required value="admin123">
+                </div>
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </form>
+        </div>
+
+        <!-- Section dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div class="user-info" id="userInfo">
+                <!-- Informations de l'utilisateur connecté -->
+            </div>
+
+            <div id="adminPanel" style="display: none;">
+                <h3>Panneau d'administration</h3>
+                
+                <form id="createUserForm" style="margin-bottom: 30px;">
+                    <h4>Créer un nouvel utilisateur</h4>
+                    <div class="form-group">
+                        <label for="newUsername">Nom d'utilisateur</label>
+                        <input type="text" id="newUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newEmail">Email</label>
+                        <input type="email" id="newEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Mot de passe</label>
+                        <input type="password" id="newPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newRole">Rôle</label>
+                        <select id="newRole" name="role">
+                            <option value="user">Utilisateur</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Permissions</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="perm_clients" name="permissions" value="clients">
+                                <label for="perm_clients">Clients</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="perm_factures" name="permissions" value="factures">
+                                <label for="perm_factures">Factures</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="perm_paiements" name="permissions" value="paiements">
+                                <label for="perm_paiements">Paiements</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="perm_dossiers" name="permissions" value="dossiers_voyage">
+                                <label for="perm_dossiers">Dossiers Voyage</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Créer l'utilisateur</button>
+                </form>
+
+                <div id="usersList">
+                    <h4>Liste des utilisateurs</h4>
+                    <div class="users-list" id="usersContainer">
+                        <!-- Liste des utilisateurs -->
+                    </div>
+                </div>
+            </div>
+
+            <button id="logoutBtn" class="btn btn-secondary">Se déconnecter</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentUser = null;
+        let authToken = null;
+
+        // Fonction pour afficher les alertes
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Fonction pour faire des requêtes API
+        async function apiRequest(endpoint, options = {}) {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+                },
+                ...options
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, config);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erreur de requête');
+                }
+                
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        // Connexion
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const loginData = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await apiRequest('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify(loginData)
+                });
+
+                authToken = response.data.token;
+                currentUser = response.data.user;
+                
+                localStorage.setItem('authToken', authToken);
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                showDashboard();
+                showAlert('Connexion réussie!', 'success');
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Afficher le dashboard
+        function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            // Afficher les informations de l'utilisateur
+            const userInfo = document.getElementById('userInfo');
+            const permissions = currentUser.permissions || [];
+            
+            userInfo.innerHTML = `
+                <h3>Bienvenue, ${currentUser.username}</h3>
+                <p><strong>Email:</strong> ${currentUser.email}</p>
+                <p><strong>Rôle:</strong> ${currentUser.role}</p>
+                <div class="permissions">
+                    ${permissions.map(perm => `<span class="permission-badge">${perm}</span>`).join('')}
+                </div>
+            `;
+            
+            // Afficher le panneau admin si nécessaire
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminPanel').style.display = 'block';
+                loadUsers();
+            }
+        }
+
+        // Créer un utilisateur
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const permissions = Array.from(formData.getAll('permissions'));
+            
+            const userData = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                role: formData.get('role'),
+                permissions: permissions
+            };
+
+            try {
+                await apiRequest('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify(userData)
+                });
+
+                showAlert('Utilisateur créé avec succès!', 'success');
+                e.target.reset();
+                loadUsers();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Charger la liste des utilisateurs
+        async function loadUsers() {
+            try {
+                const response = await apiRequest('/users');
+                const users = response.data;
+                
+                const container = document.getElementById('usersContainer');
+                container.innerHTML = users.map(user => `
+                    <div class="user-card">
+                        <h4>${user.username} (${user.email})</h4>
+                        <p><strong>Rôle:</strong> ${user.role}</p>
+                        <p><strong>Statut:</strong> ${user.is_active ? 'Actif' : 'Inactif'}</p>
+                        <div class="permissions">
+                            ${(user.permissions || []).map(perm => `<span class="permission-badge">${perm}</span>`).join('')}
+                        </div>
+                        <div class="user-actions">
+                            ${user.is_active ? 
+                                `<button onclick="toggleUserStatus(${user.id}, false)" class="btn-danger">Désactiver</button>` :
+                                `<button onclick="toggleUserStatus(${user.id}, true)" class="btn-success">Activer</button>`
+                            }
+                            ${currentUser.id !== user.id ? `<button onclick="deleteUser(${user.id})" class="btn-danger">Supprimer</button>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showAlert('Erreur lors du chargement des utilisateurs', 'error');
+            }
+        }
+
+        // Basculer le statut d'un utilisateur
+        async function toggleUserStatus(userId, activate) {
+            try {
+                const action = activate ? 'activate' : 'deactivate';
+                await apiRequest(`/users/${userId}/${action}`, { method: 'PUT' });
+                
+                showAlert(`Utilisateur ${activate ? 'activé' : 'désactivé'} avec succès!`, 'success');
+                loadUsers();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Supprimer un utilisateur
+        async function deleteUser(userId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?')) {
+                return;
+            }
+            
+            try {
+                await apiRequest(`/users/${userId}`, { method: 'DELETE' });
+                showAlert('Utilisateur supprimé avec succès!', 'success');
+                loadUsers();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Déconnexion
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            authToken = null;
+            currentUser = null;
+            
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            
+            showAlert('Déconnexion réussie!', 'success');
+        });
+
+        // Vérifier si l'utilisateur est déjà connecté
+        window.addEventListener('load', () => {
+            const savedToken = localStorage.getItem('authToken');
+            const savedUser = localStorage.getItem('currentUser');
+            
+            if (savedToken && savedUser) {
+                authToken = savedToken;
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            }
+        });
+    </script>
+</body>
+</html>

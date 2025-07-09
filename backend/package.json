@@ -1,0 +1,28 @@
+{
+  "name": "oussama-travel-backend",
+  "version": "1.0.0",
+  "description": "Backend pour Oussama Travel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "setup-db": "node setup-database.js",
+    "migrate": "node migrate.js run",
+    "migrate:rollback": "node migrate.js rollback",
+    "migrate:generate": "node migrate.js generate",
+    "migrate:status": "node migrate.js status"
+  },
+  "author": "Oussama",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^17.0.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.1",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
