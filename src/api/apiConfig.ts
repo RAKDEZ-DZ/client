@@ -1,19 +1,15 @@
 import axios from 'axios';
 
-// Configuration de l'URL de base pour les appels API
-// Priorité à la variable d'environnement, sinon utilise l'IP du réseau
 const API_URL = import.meta.env?.VITE_API_URL || 'http://192.168.0.47:3000';
 
-// Création d'un client axios configuré
 const apiClient = axios.create({
   baseURL: API_URL,
-  timeout: 15000,  // 15 secondes de timeout
+  timeout: 15000, 
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// Intercepteur pour ajouter le token à chaque requête
 apiClient.interceptors.request.use(
   config => {
     const token = localStorage.getItem('authToken');
