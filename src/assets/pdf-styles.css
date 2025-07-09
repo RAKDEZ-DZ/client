@@ -1,11 +1,9 @@
-/* Styles spécifiques pour l'impression et le PDF */
 
-/* Style de base pour le container PDF */
 #pdf-content {
   width: 210mm; 
   min-height: 297mm;
   margin: 0 auto;
-  padding: 30mm 25mm 35mm 25mm; /* Marges plus généreuses : haut, droite, bas, gauche */
+  padding: 30mm 25mm 35mm 25mm; 
   background-color: white;
   box-shadow: 0 0 20px rgba(0,0,0,0.2);
   position: relative;
@@ -15,11 +13,9 @@
   overflow: hidden;
   box-sizing: border-box;
   border-radius: 3mm;
-  /* Élément décoratif - bordure subtile */
   border: 1px solid #e0e0e0;
 }
 
-/* Ajout d'un filigrane subtil */
 #pdf-content::before {
   content: '';
   position: absolute;
@@ -35,7 +31,6 @@
   pointer-events: none;
 }
 
-/* Élément décoratif - bordure colorée en haut */
 #pdf-content::after {
   content: '';
   position: absolute;
@@ -47,7 +42,6 @@
   z-index: 0;
 }
 
-/* Paramètres d'impression */
 @media print {
   @page {
     size: 210mm 297mm;
@@ -71,14 +65,12 @@
     border-radius: 0;
   }
 
-  /* Force l'utilisation des couleurs à l'impression */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 }
 
-/* Typographie */
 #pdf-content h1, 
 #pdf-content h2, 
 #pdf-content h3, 

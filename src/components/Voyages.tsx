@@ -7,7 +7,7 @@ import '../App.css';
 // Détection de l'environnement pour l'URL de l'API
 const getAPIBaseURL = () => {
   // Utiliser l'adresse IP spécifiée
-  return 'http://192.168.0.47:3000';
+  return 'http://192.168.0.171:3000';
 };
 
 // Configuration de l'API
