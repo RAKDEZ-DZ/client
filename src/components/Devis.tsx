@@ -996,7 +996,7 @@ const Devis = () => {
   return (
     <>
       <div className="container py-4">
-        <div className="d-flex justify-content-between align-items-center mb-4" >
+        <div className="d-flex justify-content-between align-items-center flex-wrap mb-4" >
           <div className="d-flex align-items-center">
             <h2 className="fw-bold mb-0 me-3">Gestion des {activeTab === 'devis' ? 'Devis' : 'Factures'}</h2>
             <div className="d-flex align-items-center">

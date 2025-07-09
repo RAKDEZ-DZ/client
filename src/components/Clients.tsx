@@ -763,13 +763,13 @@ const Clients = () => {
       ) : (
         <>
           <div className="mb-4">
-            <div className="d-flex justify-content-between">
+            <div className="d-flex justify-content-between flex-wrap">
               <h2 className="fw-bold mb-1">Gestion des Clients</h2>
               <button className="btn fw-semibold" 
                data-bs-toggle="modal" 
                data-bs-target="#dossierModal"
                style={{ backgroundColor: "#00AEEF", color: "white" }}>
-                + client
+                + nouveau client
               </button>
             </div>
             <div className="d-flex justify-content-center gap-2 w-md-auto my-3">

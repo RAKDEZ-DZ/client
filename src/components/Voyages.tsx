@@ -873,7 +873,7 @@ const Voyages = () => {
               <h2 className="fw-bold mb-1">Gestion des Voyages</h2>
               <button className="btn fw-semibold text-light" data-bs-toggle="modal" data-bs-target="#voyageModal"
                 style={{ backgroundColor: "#00AEEF" }}>
-                nouveau voyage
+                + nouveau voyage
               </button>
             </div>
             <div className="d-flex flex-column w-md-auto my-3">
