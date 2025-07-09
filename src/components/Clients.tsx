@@ -8,7 +8,7 @@ import '../App.css';
 // Détection de l'environnement pour l'URL de l'API
 const getAPIBaseURL = () => {
   // Utiliser l'adresse IP spécifiée
-  return 'http://192.168.0.171:3000';
+  return 'http://192.168.0.47:3000';
 };
 
 // Configuration de l'API - Utiliser apiClient au lieu de cette configuration locale
@@ -675,7 +675,7 @@ const Clients = () => {
     }
     
     // Utiliser la nouvelle route API dédiée aux documents
-    const baseUrl = apiClient.defaults.baseURL || 'http://192.168.0.171:3000';
+    const baseUrl = apiClient.defaults.baseURL || 'http://192.168.0.47:3000';
     
     // Extraire juste le nom du fichier, en supprimant les chemins
     const filename = url.split('/').pop() || url;

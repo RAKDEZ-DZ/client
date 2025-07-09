@@ -373,7 +373,7 @@ const Devis = () => {
               <h6>Informations de débogage</h6>
               <dl className="row mb-0">
                 <dt className="col-sm-4">URL Backend</dt>
-                <dd className="col-sm-8">http://192.168.0.171:3000/api/factures</dd>
+                <dd className="col-sm-8">http://192.168.0.47:3000/api/factures</dd>
                 
                 <dt className="col-sm-4">Token Auth</dt>
                 <dd className="col-sm-8">
