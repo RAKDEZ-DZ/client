@@ -1,0 +1,218 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+// Configuration de l'API
+const API_URL = import.meta.env?.VITE_API_URL || 'http://192.168.0.47:3000';
+
+// Client API avec l'URL de base correcte
+const API = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Fonction pour vérifier si l'utilisateur est déjà connecté
+export const checkAuthToken = async () => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) return false;
+
+    // Configurer les en-têtes avec le token
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    // Vérifier le token auprès du backend
+    const response = await API.get('/api/auth/me', { headers });
+    return response.data.success;
+  } catch (error) {
+    console.error('Erreur lors de la vérification du token:', error);
+    // Supprimer le token invalide
+    localStorage.removeItem('authToken');
+    return false;
+  }
+};
+
+// Fonction pour récupérer les permissions de l'utilisateur
+export const getUserPermissions = async () => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) return null;
+
+    // Configurer les en-têtes avec le token
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    // Récupérer les permissions spécifiques à l'utilisateur
+    const response = await API.get('/api/permissions/my-permissions', { headers });
+    if (response.data && response.data.success) {
+      console.log('Permissions récupérées (brut):', response.data);
+      console.log('Permissions data structure:', response.data.data);
+      
+      // Vérifier si les permissions ont le bon format
+      if (!response.data.data || !response.data.data.permissions) {
+        console.error('Format de permissions invalide:', response.data.data);
+        return null;
+      }
+      
+      // Stocker les permissions dans le format attendu par le hook usePermissions
+      localStorage.setItem('userPermissions', JSON.stringify(response.data.data));
+      
+      // Log the saved permissions for debugging
+      console.log('Permissions sauvegardées dans localStorage:', JSON.stringify(response.data.data));
+      
+      return response.data.data;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des permissions:', error);
+    return null;
+  }
+};
+
+export default function Login({setIsAuthenticated}: any) {
+    const [email, setemail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    
+  
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e: any) => {
+      e.preventDefault();
+      setLoading(true);
+      setError('');
+      
+      try {
+        // Appel à l'API d'authentification du backend
+        console.log('Tentative de connexion avec:', { email });
+        const response = await API.post('/api/auth/login', {
+          email,
+          password
+        });
+        
+        // Afficher la réponse complète pour débogage
+        console.log('Réponse complète du serveur:', response);
+        
+        // Vérifier la réponse
+        if (response.data && response.data.data && response.data.data.token) {
+          // Stocker le token dans localStorage
+          localStorage.setItem('authToken', response.data.data.token);
+          
+          // Stocker les informations utilisateur si présentes
+          if (response.data.data.user) {
+            localStorage.setItem('user', JSON.stringify(response.data.data.user));
+            console.log('Informations utilisateur sauvegardées:', response.data.data.user);
+          }
+          
+          // Récupérer les permissions de l'utilisateur
+          try {
+            console.log('Tentative de récupération des permissions...');
+            const permissions = await getUserPermissions();
+            console.log('Permissions récupérées après login:', permissions);
+            
+            if (!permissions) {
+              console.warn('Aucune permission récupérée ou format incorrect');
+            }
+            
+            // Même sans permissions, on continue (l'utilisateur pourrait être admin)
+            console.log('Authentification réussie:', response.data);
+            setIsAuthenticated(true);
+          } catch (permError) {
+            console.error('Erreur lors de la récupération des permissions:', permError);
+            
+            // On continue quand même l'authentification
+            console.log('Authentification réussie (malgré erreur permissions):', response.data);
+            setIsAuthenticated(true);
+          }
+        } else {
+          console.error('Format de réponse incorrect:', response.data);
+          setError(`Format de réponse incorrect: ${JSON.stringify(response.data)}`);
+        }
+      } catch (err: any) {
+        console.error('Erreur d\'authentification:', err);
+        
+        // Gérer les différents cas d'erreur
+        if (err.response) {
+          // Le serveur a répondu avec un code d'erreur
+          console.log('Détails de l\'erreur:', err.response.data);
+          if (err.response.status === 401) {
+            setError('Email ou mot de passe incorrect');
+          } else if (err.response.data && err.response.data.message) {
+            setError(err.response.data.message);
+          } else {
+            setError(`Erreur ${err.response.status}: ${err.response.statusText}`);
+          }
+        } else if (err.request) {
+          // La requête a été envoyée mais n'a pas reçu de réponse
+          setError('Impossible de contacter le serveur. Vérifiez votre connexion.');
+        } else {
+          // Une erreur s'est produite lors de la configuration de la requête
+          setError('Une erreur est survenue: ' + err.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+  return (
+    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+      <div className="card shadow-lg p-4" style={{ width: '100%', maxWidth: '400px' }}>
+        <div className="text-center mb-4">
+        <img src="/lg.png" width={"180px"} height={"150px"} alt="Logo" />
+
+          <h3 className="fw-bold">Connexion</h3>
+          <p className="text-muted">Bienvenue ! Veuillez vous connecter.</p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">Adresse e-mail</label>
+            <input type="email" className="form-control" id="email" placeholder="ex: user@email.com"
+             value={email}
+             onChange={(e) => setemail(e.target.value)} required />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">Mot de passe</label>
+            <input type="password" className="form-control" id="password" placeholder="********"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} required />
+          </div>
+          {/* <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="form-check">
+              <input className="form-check-input" type="checkbox" id="remember" />
+              <label className="form-check-label" htmlFor="remember">
+                Se souvenir de moi
+              </label>
+            </div>
+            <a href="#" className="text-decoration-none">Mot de passe oublié ?</a>
+          </div> */}
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
+          
+          <button 
+            type="submit" 
+            className="btn btn-primary w-100" 
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Connexion en cours...
+              </>
+            ) : (
+              'Se connecter'
+            )}
+          </button>
+        </form>
+        {/* <div className="text-center mt-3">
+          <small className="text-muted">Pas de compte ? <a href="#" className="text-primary">S'inscrire</a></small>
+        </div> */}
+      </div>
+    </div>
+  );
+}

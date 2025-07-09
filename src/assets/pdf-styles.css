@@ -1,0 +1,342 @@
+/* Styles spécifiques pour l'impression et le PDF */
+
+/* Style de base pour le container PDF */
+#pdf-content {
+  width: 210mm; 
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 30mm 25mm 35mm 25mm; /* Marges plus généreuses : haut, droite, bas, gauche */
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  position: relative;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 11pt;
+  color: #333;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 3mm;
+  /* Élément décoratif - bordure subtile */
+  border: 1px solid #e0e0e0;
+}
+
+/* Ajout d'un filigrane subtil */
+#pdf-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250" opacity="0.03"><text x="25" y="125" font-family="Arial" font-size="35" fill="%2300AEEF" transform="rotate(-45 125 125)">OUSSAMA TRAVEL</text></svg>');
+  background-repeat: repeat;
+  background-position: center;
+  opacity: 0.05;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Élément décoratif - bordure colorée en haut */
+#pdf-content::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10mm;
+  background: linear-gradient(90deg, #00AEEF 0%, #0080af 100%);
+  z-index: 0;
+}
+
+/* Paramètres d'impression */
+@media print {
+  @page {
+    size: 210mm 297mm;
+    margin: 0;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+  }
+
+  #pdf-content {
+    box-shadow: none;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border: none;
+    border-radius: 0;
+  }
+
+  /* Force l'utilisation des couleurs à l'impression */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Typographie */
+#pdf-content h1, 
+#pdf-content h2, 
+#pdf-content h3, 
+#pdf-content h4, 
+#pdf-content h5 {
+  margin-top: 0;
+  color: #00AEEF;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+#pdf-content h2 {
+  font-size: 20pt;
+  margin-bottom: 0.5rem;
+}
+
+#pdf-content h5 {
+  font-size: 13pt;
+  margin-bottom: 10px;
+  position: relative;
+  display: inline-block;
+}
+
+#pdf-content h5::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, #00AEEF 0%, rgba(0, 174, 239, 0.1) 100%);
+}
+
+#pdf-content p {
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+/* Tableaux */
+#pdf-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  border: 1px solid #dee2e6;
+}
+
+#pdf-content table th,
+#pdf-content table td {
+  padding: 10px;
+  border: 1px solid #dee2e6;
+  vertical-align: top;
+}
+
+#pdf-content table th {
+  font-weight: 600;
+  background-color: rgba(0, 174, 239, 0.08);
+  color: #00AEEF;
+  border-bottom: 2px solid #00AEEF;
+}
+
+#pdf-content .table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+#pdf-content .table-bordered th, 
+#pdf-content .table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+#pdf-content .table-light, 
+#pdf-content thead.table-light {
+  background-color: rgba(0, 174, 239, 0.08);
+}
+
+#pdf-content tfoot tr {
+  font-weight: bold;
+  background-color: #f8f9fa;
+}
+
+#pdf-content tfoot tr:last-child {
+  background-color: rgba(0, 174, 239, 0.12);
+}
+
+#pdf-content tfoot th {
+  border-top: 2px solid #00AEEF;
+}
+
+/* Layout et espacement */
+#pdf-content .row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+#pdf-content .col-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+#pdf-content .mb-0 { margin-bottom: 0 !important; }
+#pdf-content .mb-1 { margin-bottom: 0.25rem !important; }
+#pdf-content .mb-2 { margin-bottom: 0.5rem !important; }
+#pdf-content .mb-3 { margin-bottom: 1rem !important; }
+#pdf-content .mb-4 { margin-bottom: 1.5rem !important; }
+#pdf-content .mb-5 { margin-bottom: 3rem !important; }
+
+#pdf-content .mt-0 { margin-top: 0 !important; }
+#pdf-content .mt-1 { margin-top: 0.25rem !important; }
+#pdf-content .mt-2 { margin-top: 0.5rem !important; }
+#pdf-content .mt-3 { margin-top: 1rem !important; }
+#pdf-content .mt-4 { margin-top: 1.5rem !important; }
+#pdf-content .mt-5 { margin-top: 3rem !important; }
+
+#pdf-content .p-3 { padding: 1rem !important; }
+#pdf-content .pb-2 { padding-bottom: 0.5rem !important; }
+#pdf-content .pt-4 { padding-top: 1.5rem !important; }
+
+/* Styles spécifiques */
+#pdf-content .border {
+  border: 1px solid #dee2e6 !important;
+}
+
+#pdf-content .border-top {
+  border-top: 1px solid #dee2e6 !important;
+}
+
+#pdf-content .border-bottom {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+#pdf-content .rounded {
+  border-radius: 0.25rem !important;
+}
+
+#pdf-content .bg-light {
+  background-color: #f8f9fa !important;
+}
+
+#pdf-content .text-muted {
+  color: #6c757d !important;
+}
+
+#pdf-content .text-center {
+  text-align: center !important;
+}
+
+#pdf-content .text-end {
+  text-align: right !important;
+}
+
+#pdf-content .d-flex {
+  display: flex !important;
+}
+
+#pdf-content .justify-content-between {
+  justify-content: space-between !important;
+}
+
+#pdf-content .align-items-center {
+  align-items: center !important;
+}
+
+/* Badges */
+#pdf-content .badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}
+
+#pdf-content .badge.bg-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+#pdf-content .badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: black !important;
+}
+
+#pdf-content .badge.bg-danger {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+#pdf-content .badge.bg-secondary {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+
+/* Contenu spécifique à la facture */
+#pdf-content .facture-header {
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+#pdf-content .facture-header::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0, 174, 239, 0.5) 0%, rgba(0, 174, 239, 0.1) 100%);
+}
+
+#pdf-content .facture-footer {
+  position: absolute;
+  bottom: 25mm;
+  left: 25mm;
+  right: 25mm;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 174, 239, 0.3);
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+}
+
+/* Style pour les boîtes info */
+#pdf-content .info-box {
+  padding: 15px;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  height: 100%;
+  position: relative;
+}
+
+#pdf-content .info-box.company {
+  border-left: 4px solid #00AEEF;
+}
+
+#pdf-content .info-box.client {
+  border-right: 4px solid #00AEEF;
+}
+
+/* Style pour les montants importants */
+#pdf-content .amount-highlight {
+  color: #00AEEF;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/* Badge statut amélioré */
+#pdf-content .status-badge {
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+  font-weight: 600;
+  margin-left: 5px;
+  font-size: 0.85em;
+}
