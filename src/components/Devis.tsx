@@ -187,7 +187,6 @@ const Devis = () => {
       const response = await apiClient.delete(`/api/factures/${id}`);
 
       if (response.data.success) {
-        // Rafraîchir la liste des factures
         fetchFactures();
         setShowModalVerify(false);
         setIdToDelete(null);
@@ -1552,6 +1551,7 @@ const Devis = () => {
                   type="button" 
                   className="btn btn-danger" 
                   onClick={DeleteVoyage}
+                  // onClick={()=>deleteFacture(IdToDelete as any)}
                   disabled={loading}
                 >
                   {loading ? (
