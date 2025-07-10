@@ -769,7 +769,7 @@ const Clients = () => {
                data-bs-toggle="modal" 
                data-bs-target="#dossierModal"
                style={{ backgroundColor: "#00AEEF", color: "white" }}>
-                + nouveau client
+                + client
               </button>
             </div>
             <div className="d-flex justify-content-center gap-2 w-md-auto my-3">
@@ -1053,8 +1053,8 @@ const Clients = () => {
                 >
                   <option value="">-- Sélectionnez un type de visa --</option>
                   <option value="tourisme">Visa Tourisme</option>
-                  <option value="affaires">Visa Affaires</option>
                   <option value="études">Visa Études</option>
+                  <option value="Sans visa">Sans visa</option>
                 </select>
                 {errors.type_visa && <div className="invalid-feedback">{errors.type_visa}</div>}
               </div>
@@ -1271,7 +1271,7 @@ const Clients = () => {
                 >
                   <option value="">-- Sélectionnez un type de visa --</option>
                   <option value="tourisme">Visa Tourisme</option>
-                  <option value="affaires">Visa Affaires</option>
+                  <option value="Sans visa">Sans Visa</option>
                   <option value="études">Visa Études</option>
                 </select>
                 {errors.type_visa && <div className="invalid-feedback">{errors.type_visa}</div>}

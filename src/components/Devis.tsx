@@ -338,7 +338,7 @@ const Devis = () => {
 
   const renderTable = (data: any[]) => (
     // <div className="table-responsive" >
-<div className={loading ? "container" : "position-absolute table-responsive1"}>
+<div className={loading || data.length === 0  ? "container" : "position-absolute table-responsive1"}>
       {loading ? (
         <div className="text-center py-4">
           <div className="spinner-border text-primary" role="status">
@@ -399,7 +399,7 @@ const Devis = () => {
           )}
         </div>
       ) : data.length === 0 ? (
-        <div className="alert alert-info">Aucune facture disponible</div>
+        <div className="alert alert-info text-center">Aucune facture disponible</div>
       ) : (
         // <table className="table table-hover align-middle mb-0" style={{ minWidth: '800px', width: '100%' }}>
         <table className="table table-hover align-middle mb-0">

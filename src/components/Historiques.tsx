@@ -22,7 +22,6 @@ const Historique = ({ setIsAuthenticated }: any) => {
     users: false
   });
   
-  // Vérifier l'état de l'API au chargement du composant
   useEffect(() => {
     testApiConnection();
   }, []);
