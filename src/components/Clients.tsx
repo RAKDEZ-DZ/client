@@ -550,7 +550,6 @@ const Clients = () => {
     }
   };
 
-
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
