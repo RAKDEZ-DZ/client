@@ -620,8 +620,6 @@ const Voyages = () => {
     calculateResteAPayer();
   }, [travelFormData.prix_total, travelFormData.acompte_verse]);
 
-
-
   // Vérifier l'authentification au chargement
   useEffect(() => {
     const token = localStorage.getItem('authToken');

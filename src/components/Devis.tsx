@@ -65,59 +65,59 @@ const Devis = () => {
   const [showDebugInfo, setShowDebugInfo] = useState<boolean>(false);
   
   // Données de test pour développement en cas d'erreur API
-  const testFactures: Facture[] = [
-    {
-      id: 1,
-      numero_facture: 'FAC-2025-001',
-      client_id: 1,
-      nom: 'Dupont',
-      prenom: 'Jean',
-      dossier_voyage_id: 101,
-      titre: 'Voyage Paris-Madrid',
-      description: 'Billets d\'avion et 3 nuits d\'hôtel',
-      montant_ht: 750,
-      montant_paye: 300,
-      montant_restant: 450,
-      type_facture: 'standard',
-      date_creation: '2025-06-15',
-      date_envoi: '2025-06-16',
-      conditions_paiement: 'Paiement à 30 jours'
-    },
-    {
-      id: 2,
-      numero_facture: 'FAC-2025-002',
-      client_id: 2,
-      nom: 'Martin',
-      prenom: 'Sophie',
-      dossier_voyage_id: 102,
-      titre: 'Voyage d\'affaires New York',
-      description: 'Vol business class et 5 nuits d\'hôtel',
-      montant_ht: 2500,
-      montant_paye: 2500,
-      montant_restant: 0,
-      type_facture: 'standard',
-      date_creation: '2025-06-18',
-      date_envoi: '2025-06-19',
-      conditions_paiement: 'Paiement à 30 jours'
-    },
-    {
-      id: 3,
-      numero_facture: 'FAC-2025-003',
-      client_id: 3,
-      nom: 'Garcia',
-      prenom: 'Manuel',
-      dossier_voyage_id: 103,
-      titre: 'Séjour linguistique Londres',
-      description: 'Vol + hébergement pour 2 semaines',
-      montant_ht: 1800,
-      montant_paye: 900,
-      montant_restant: 900,
-      type_facture: 'standard',
-      date_creation: '2025-06-20',
-      date_envoi: '2025-06-21',
-      conditions_paiement: 'Paiement en 2 fois'
-    }
-  ];
+  // const testFactures: Facture[] = [
+  //   {
+  //     id: 1,
+  //     numero_facture: 'FAC-2025-001',
+  //     client_id: 1,
+  //     nom: 'Dupont',
+  //     prenom: 'Jean',
+  //     dossier_voyage_id: 101,
+  //     titre: 'Voyage Paris-Madrid',
+  //     description: 'Billets d\'avion et 3 nuits d\'hôtel',
+  //     montant_ht: 750,
+  //     montant_paye: 300,
+  //     montant_restant: 450,
+  //     type_facture: 'standard',
+  //     date_creation: '2025-06-15',
+  //     date_envoi: '2025-06-16',
+  //     conditions_paiement: 'Paiement à 30 jours'
+  //   },
+  //   {
+  //     id: 2,
+  //     numero_facture: 'FAC-2025-002',
+  //     client_id: 2,
+  //     nom: 'Martin',
+  //     prenom: 'Sophie',
+  //     dossier_voyage_id: 102,
+  //     titre: 'Voyage d\'affaires New York',
+  //     description: 'Vol business class et 5 nuits d\'hôtel',
+  //     montant_ht: 2500,
+  //     montant_paye: 2500,
+  //     montant_restant: 0,
+  //     type_facture: 'standard',
+  //     date_creation: '2025-06-18',
+  //     date_envoi: '2025-06-19',
+  //     conditions_paiement: 'Paiement à 30 jours'
+  //   },
+  //   {
+  //     id: 3,
+  //     numero_facture: 'FAC-2025-003',
+  //     client_id: 3,
+  //     nom: 'Garcia',
+  //     prenom: 'Manuel',
+  //     dossier_voyage_id: 103,
+  //     titre: 'Séjour linguistique Londres',
+  //     description: 'Vol + hébergement pour 2 semaines',
+  //     montant_ht: 1800,
+  //     montant_paye: 900,
+  //     montant_restant: 900,
+  //     type_facture: 'standard',
+  //     date_creation: '2025-06-20',
+  //     date_envoi: '2025-06-21',
+  //     conditions_paiement: 'Paiement en 2 fois'
+  //   }
+  // ];
 
   // Fonction pour récupérer toutes les factures
   const fetchFactures = async () => {
@@ -263,18 +263,18 @@ const Devis = () => {
     // En cas d'erreur ou pas de données, utiliser les données de test
     else if (error) {
       console.log('Utilisation des données de test car erreur API:', error);
-      return testFactures.map(facture => ({
-        id: facture.numero_facture,
-        nomPrenom: `${facture.nom} ${facture.prenom}`,
-        email: '', 
-        telephone: '',
-        dossier: facture.titre,
-        date: facture.date_creation,
-        montant: `${facture.montant_ht} DA`,
-        montantRestant: `${facture.montant_restant} DA`,
-        statut: getStatut(facture),
-        facture: facture
-      }));
+      // return testFactures.map(facture => ({
+      //   id: facture.numero_facture,
+      //   nomPrenom: `${facture.nom} ${facture.prenom}`,
+      //   email: '', 
+      //   telephone: '',
+      //   dossier: facture.titre,
+      //   date: facture.date_creation,
+      //   montant: `${facture.montant_ht} DA`,
+      //   montantRestant: `${facture.montant_restant} DA`,
+      //   statut: getStatut(facture),
+      //   facture: facture
+      // }));
     }
     // Si aucune donnée et aucune erreur (chargement initial)
     else {
@@ -367,7 +367,7 @@ const Devis = () => {
             </button>
           </div>
           
-          {showDebugInfo && (
+          {/* {showDebugInfo && (
             <div className="mt-3 p-3 bg-light border rounded small">
               <h6>Informations de débogage</h6>
               <dl className="row mb-0">
@@ -396,7 +396,7 @@ const Devis = () => {
                 </button>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       ) : data.length === 0 ? (
         <div className="alert alert-info text-center">Aucune facture disponible</div>
@@ -991,8 +991,6 @@ const Devis = () => {
   const findClientById = (id: number): Client | undefined => {
     return clients.find(client => client.id === id);
   };
-
-
 
   return (
     <>

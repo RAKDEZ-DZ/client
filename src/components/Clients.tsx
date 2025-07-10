@@ -256,24 +256,13 @@ const Clients = () => {
 
   const getClients = async () => {
     try {
-      console.log('Tentative de récupération des clients...');
 
-      // Affiche l'URL complète pour le débogage
-      console.log('URL de l\'API:', apiClient.defaults.baseURL + '/api/clients');
-
-      // Ajout d'un timeout plus long pour les requêtes
       const response = await apiClient.get('/api/clients', {
         headers: {
           'Content-Type': 'application/json'
         },
-        timeout: 10000 // 10 secondes de timeout
       });
 
-      console.log('Réponse API clients (status):', response.status);
-      console.log('Réponse API clients (headers):', response.headers);
-      console.log('Réponse API clients (data):', response.data);
-
-      // Vérification plus détaillée des données reçues
       if (response.data) {
         if (Array.isArray(response.data)) {
           console.log(`Nombre de clients récupérés: ${response.data.length}`);
@@ -291,7 +280,6 @@ const Clients = () => {
             // Tenter de convertir l'objet en tableau si possible
             const clientsArray = Object.values(response.data) as ClientType[];;
             if (clientsArray.length > 0 && typeof clientsArray[0] === 'object') {
-              console.log('Conversion de l\'objet en tableau:', clientsArray);
               setClients(clientsArray);
             } else {
               console.error('Impossible de traiter les données comme un tableau de clients');
@@ -405,8 +393,6 @@ const Clients = () => {
     if (validateForm()) {
       try {
         setLoading(true);
-        console.log('Début de la mise à jour du client avec ID:', id);
-
         const formDataToSend = new FormData();
 
         // Ajouter tous les champs du formulaire, même vides
@@ -416,9 +402,6 @@ const Clients = () => {
           formDataToSend.append(key, valueToSend);
           console.log(`Ajout du champ ${key}:`, valueToSend);
         });
-
-        // Vérifier si formData contient tous les champs
-        console.log('FormData créé avec les champs:', [...formDataToSend.entries()].map(([key, value]) => key));
 
         // Gestion des fichiers
         if (selectedFiles.length > 0) {
@@ -433,20 +416,9 @@ const Clients = () => {
             [...formDataToSend.entries()].filter(([key]) => key === 'documents').length);
         }
 
-        // Utiliser notre client API centralisé pour la mise à jour
-        console.log('Mise à jour du client avec ID:', id);
-
         // Pour FormData, nous devons définir le header Content-Type à undefined
-        const response = await apiClient.put(`/api/clients/${id}`, formDataToSend, {
-          headers: {
-            'Content-Type': undefined // Nécessaire pour que axios définisse le bon Content-Type multipart/form-data
-          },
-          timeout: 30000 // Augmenter le timeout à 30 secondes
-        });
+        const response = await apiClient.put(`/api/clients/${id}`, formDataToSend);
 
-        console.log('Réponse de mise à jour du client:', response.data);
-
-        // Réinitialiser le formulaire
         setFormData({
           nom: '',
           prenom: '',
@@ -466,12 +438,8 @@ const Clients = () => {
         });
         setSelectedFiles([]);
         setIdToUpdate(null);
-
-        // Fermer la modal avec notre fonction utilitaire fiable
-        // closeModal('EditedossierModal');
-
-        // Rafraîchir la liste des clients
         getClients();
+        setLoading(false)
 
         console.log('Client mis à jour avec succès:', response.data);
       } catch (error: any) {
@@ -494,7 +462,6 @@ const Clients = () => {
           seterrorsApi(`Erreur: ${error.message}`);
         }
 
-        // Ne pas fermer la modal pour permettre à l'utilisateur de voir l'erreur et de corriger si nécessaire
       }
     }
   };
