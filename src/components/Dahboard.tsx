@@ -794,9 +794,9 @@ const Dashboard = () => {
               ) : clients.length > 0 ? (
                 (() => {
                   const filteredClients = clients.filter(client => 
-                    clientStatusFilter === 'all' || 
-                    (client.etat_dossier?.toLowerCase() === clientStatusFilter) ||
-                    (client.statut?.toLowerCase() === clientStatusFilter)
+                    clientStatusFilter === 'all' || (client.statut === clientStatusFilter) ||
+                    (client.etat_dossier === clientStatusFilter) 
+                    
                   );
                   
                   if (filteredClients.length === 0) {
