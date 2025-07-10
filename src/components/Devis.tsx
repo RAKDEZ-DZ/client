@@ -1027,7 +1027,7 @@ const Devis = () => {
        
         </div>
 
-        <div>{renderTable(getFormattedData())}</div>
+        <div>{renderTable(getFormattedData() ?? [])}</div>
 
         <div className="modal fade" id="modalView" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-xl" style={{ maxWidth: '900px' }}>
