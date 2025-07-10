@@ -149,7 +149,7 @@ const FacturePreview: React.FC<FacturePreviewProps> = ({ selectedItem, activeTab
               <th style={{ width: '10%' }}>Référence</th>
               <th style={{ width: '50%' }}>Désignation</th>
               <th style={{ width: '20%' }} className="text-end">Prix Unitaire</th>
-              <th style={{ width: '20%' }} className="text-end">Total HT</th>
+              <th style={{ width: '20%' }} className="text-end">Total</th>
             </tr>
           </thead>
           <tbody>
