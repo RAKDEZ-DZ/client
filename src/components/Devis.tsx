@@ -1354,7 +1354,7 @@ const Devis = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Versement initial (DA)</label>
+                    <label className="form-label">Versement initial</label>
                     <input
                       type="number"
                       className="form-control"

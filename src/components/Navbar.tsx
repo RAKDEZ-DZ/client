@@ -7,7 +7,6 @@ import { MdManageHistory } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 import { usePermissions } from "../hooks/usePermissions";
 import "../App.css";
-import { useNavigate } from 'react-router-dom';
 
 type NavbarProps = {
   ActiveComponents: string;
@@ -18,7 +17,6 @@ type NavbarProps = {
 const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, setIsAuthenticated }) => {
   const [ShowModalVerify, setShowModalVerify] = useState(false);
   const { canViewPage, isAdmin, permissions, loaded } = usePermissions();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Afficher les permissions chargées pour débogage
@@ -51,7 +49,6 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
     if (setIsAuthenticated) {
       setIsAuthenticated(false);
     }
-    navigate('/');
   };
 
   // Si les permissions ne sont pas encore chargées, montrer un indicateur de chargement
@@ -65,7 +62,18 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
     );
   }
 
-  console.log('Navbar - Rendu avec permissions:', { isAdmin, permissions });
+
+  const AlertShow = () => {
+    const password = window.prompt("Veuillez entrer le mot de passe pour accéder aux devis & factures :");
+  
+    if (password === "admin12345o") {
+      setActiveComponents("devis")
+    }
+
+   
+  };
+  
+
 
   return (
     <>
@@ -112,11 +120,14 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
             </li>
           )}
 
+
+{/*   onClick={() => setActiveComponents("devis")} */}
+
           {/* Afficher le menu Factures uniquement si l'utilisateur a la permission */}
           {(canViewPage('factures') || isAdmin) && (
-            <li className={`nav-item rounded`}
+            <li className={`nav-item rounded`}  data-bs-toggle="modal" data-bs-target="#exampleModal"
               style={{ backgroundColor: `${ActiveComponents === "devis" ? "#00AEEF " : ""}` }}
-              onClick={() => setActiveComponents("devis")}>
+             onClick={AlertShow}>
               <a href="#" className="nav-link text-white d-flex">
                 <FaRegFileAlt className='mx-1 mt-1' />
                 <p className='pNav'>Devis & Factures</p>
@@ -125,7 +136,7 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
           )}
 
           {/* Afficher le menu Gestion des employés uniquement pour les admins */}
-          {(canViewPage('users') || isAdmin) && (
+          {/* {(canViewPage('users') || isAdmin) && (
             <li className={`nav-item rounded`}
               style={{ backgroundColor: `${ActiveComponents === "Historiques" ? "#00AEEF " : ""}` }}
               onClick={() => setActiveComponents("Historiques")}>
@@ -134,8 +145,9 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
                 <p className='pNav'>Employe</p>
               </a>
             </li>
-          )}
+          )} */}
         </ul>
+
 
         <hr />
         <li className={`nav-item rounded `}
