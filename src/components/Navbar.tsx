@@ -7,6 +7,7 @@ import { MdManageHistory } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 import { usePermissions } from "../hooks/usePermissions";
 import "../App.css";
+import { useNavigate } from 'react-router-dom';
 
 type NavbarProps = {
   ActiveComponents: string;
@@ -17,7 +18,8 @@ type NavbarProps = {
 const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, setIsAuthenticated }) => {
   const [ShowModalVerify, setShowModalVerify] = useState(false);
   const { canViewPage, isAdmin, permissions, loaded } = usePermissions();
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Afficher les permissions chargées pour débogage
     console.log('Navbar - Permissions chargées:', { isAdmin, permissions, loaded });
@@ -42,8 +44,6 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
   };
   
   const handleLogout = () => {
-    console.log('Déconnexion...');
-    // Supprimer toutes les données stockées
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     localStorage.removeItem("userPermissions");
@@ -51,6 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
     if (setIsAuthenticated) {
       setIsAuthenticated(false);
     }
+    navigate('/');
   };
 
   // Si les permissions ne sont pas encore chargées, montrer un indicateur de chargement
