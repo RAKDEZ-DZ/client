@@ -99,7 +99,6 @@ const Historique = ({ setIsAuthenticated }: any) => {
     setSuccessMessage('');
 
     try {
-      // Vérifier si l'utilisateur est connecté
       const isTokenValid = await checkToken();
       if (!isTokenValid) {
         setLoading(false);
@@ -142,14 +141,11 @@ const Historique = ({ setIsAuthenticated }: any) => {
         return;
       }
 
-      // Préparer les données de l'utilisateur
-      // Extraire uniquement les clés des permissions activées
       const selectedPermissions = Object.keys(permissions)
         .filter(key => permissions[key as keyof typeof permissions]);
 
       console.log('Permissions sélectionnées:', selectedPermissions);
 
-      // S'assurer que les permissions sont au format attendu par le backend
       const userData = {
         username: userName,
         email: email,
@@ -302,7 +298,7 @@ const Historique = ({ setIsAuthenticated }: any) => {
         </div>
 
         {/* Indicateur d'état de l'API */}
-        <div className={`alert ${apiStatus === 'connected' ? 'alert-success' : apiStatus === 'connecting' ? 'alert-warning' : 'alert-danger'} d-flex align-items-center mb-3`}>
+        {/* <div className={`alert ${apiStatus === 'connected' ? 'alert-success' : apiStatus === 'connecting' ? 'alert-warning' : 'alert-danger'} d-flex align-items-center mb-3`}>
           <div className="me-2">
             {apiStatus === 'connected' ? (
               <i className="bi bi-check-circle-fill"></i>
@@ -320,45 +316,8 @@ const Historique = ({ setIsAuthenticated }: any) => {
                 : `Problème de connexion à l'API: ${apiClient.defaults.baseURL}`
             }
           </div>
-          {apiStatus === 'error' && (
-            <button
-              className="btn btn-sm btn-outline-danger ms-auto"
-              onClick={testApiConnection}
-              disabled={loading}
-            >
-              Retester
-            </button>
-          )}
-        </div>
-
-        {error && (
-          <div className="alert alert-danger" role="alert">
-            <h5 className="alert-heading">Erreur</h5>
-            <hr />
-            <p className="mb-0">{error}</p>
-            {error.includes('authentification') && (
-              <div className="mt-2">
-                <button
-                  className="btn btn-sm btn-outline-danger"
-                  onClick={() => {
-                    localStorage.removeItem('authToken');
-                    setIsAuthenticated(false);
-                  }}
-                >
-                  Se reconnecter
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="alert alert-success" role="alert">
-            <h5 className="alert-heading">Succès</h5>
-            <hr />
-            <p className="mb-0">{successMessage}</p>
-          </div>
-        )}
+          
+        </div> */}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -498,6 +457,7 @@ const Historique = ({ setIsAuthenticated }: any) => {
                   "Créer l'utilisateur"
                 )}
               </button>
+              {successMessage}
             </div>
 
           </div>

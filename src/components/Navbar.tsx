@@ -136,7 +136,7 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
           )}
 
           {/* Afficher le menu Gestion des employés uniquement pour les admins */}
-          {/* {(canViewPage('users') || isAdmin) && (
+          {(canViewPage('users') || isAdmin) && (
             <li className={`nav-item rounded`}
               style={{ backgroundColor: `${ActiveComponents === "Historiques" ? "#00AEEF " : ""}` }}
               onClick={() => setActiveComponents("Historiques")}>
@@ -145,7 +145,7 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
                 <p className='pNav'>Employe</p>
               </a>
             </li>
-          )} */}
+          )}
         </ul>
 
 
