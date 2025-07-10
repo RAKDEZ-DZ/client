@@ -11,33 +11,21 @@ const getAPIBaseURL = () => {
   return 'https://backend1-lz19.onrender.com';
 };
 
-// Configuration de l'API - Utiliser apiClient au lieu de cette configuration locale
-// Pour compatibilité, gardons la fonction getAPIBaseURL pour l'instant
-
-// Log la configuration de l'API
-console.log('Configuration de l\'API:', {
-  baseURL: apiClient.defaults.baseURL,
-  timeout: apiClient.defaults.timeout,
-});
-
 // Intercepteur pour ajouter le token d'authentification à toutes les requêtes
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log('Requête API:', config.method?.toUpperCase(), config.url, 'Headers:', config.headers);
   return config;
 }, (error) => {
-  console.error('Erreur dans l\'intercepteur de requête:', error);
   return Promise.reject(error);
 });
 
 // Intercepteur pour la gestion des réponses
 apiClient.interceptors.response.use(
   (response) => {
-    console.log('Réponse API:', response.status, response.config.url);
-    console.log('Type de données reçues:', typeof response.data);
+    ;
     if (Array.isArray(response.data)) {
       console.log('Nombre d\'éléments reçus:', response.data.length);
       if (response.data.length > 0) {
@@ -469,28 +457,21 @@ const Clients = () => {
   const deleteClient = async (id: number) => {
     try {
       setLoading(true);
-      console.log(`Suppression du client avec l'ID: ${id}`);
 
-      // Utiliser notre client API centralisé
-      console.log('Suppression du client: /api/clients/' + id);
+   
 
-      const response = await apiClient.delete(`/api/clients/${id}`, {
-        timeout: 10000
-      });
+      const response = await apiClient.delete(`/api/clients/${id}`);
 
-      console.log('Réponse de suppression:', response.data);
 
       // Fermer la modal de confirmation
       setShowModalVerify(false);
       setIdToDelete(null);
 
-      // Afficher un message de succès temporaire
       seterrorsApi('');
 
       // Rafraîchir la liste des clients
       getClients();
 
-      console.log('Client supprimé avec succès');
     } catch (error: any) {
       console.error('Erreur lors de la suppression du client:', error);
 
@@ -542,7 +523,7 @@ const Clients = () => {
         }
       });
 
-      setClients(response.data);
+      setClients(response.data.data);
       console.log('Résultats de la recherche:', response.data);
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);
@@ -729,6 +710,8 @@ const Clients = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [clients]);
+
+  const [confirmText, setconfirmText] = useState('')
 
   return (
     <div className="container py-4">
@@ -1096,13 +1079,13 @@ const Clients = () => {
                           <td>
                             {client.statut ? (
                               <span className={`badge ${client.statut === 'nouveau' || client.statut === 'inscrit' ? 'bg-info' :
-                                  client.statut === 'en_cours' ? 'bg-primary' :
-                                    client.statut === 'incomplet' ? 'bg-warning' :
-                                      client.statut === 'admission_recu' ? 'bg-success' :
-                                        client.statut === 'refus' ? 'bg-danger' :
-                                          client.statut === 'accepter' ? 'bg-success' :
-                                            client.statut === 'partie_visa' ? 'bg-secondary' :
-                                              client.statut === 'terminer' ? 'bg-dark' : 'bg-secondary'
+                                client.statut === 'en_cours' ? 'bg-primary' :
+                                  client.statut === 'incomplet' ? 'bg-warning' :
+                                    client.statut === 'admission_recu' ? 'bg-success' :
+                                      client.statut === 'refus' ? 'bg-danger' :
+                                        client.statut === 'accepter' ? 'bg-success' :
+                                          client.statut === 'partie_visa' ? 'bg-secondary' :
+                                            client.statut === 'terminer' ? 'bg-dark' : 'bg-secondary'
                                 }`}>
                                 {client.statut === 'nouveau' ? 'Nouveau' :
                                   client.statut === 'inscrit' ? 'Inscrit' :
@@ -1236,52 +1219,52 @@ const Clients = () => {
             )}
           </div>
 
-        <div className='container'  >
-        {Array.isArray(clients) && clients.length > itemsPerPage && (
-            <nav className="mt-3">
-              <ul className="pagination justify-content-center">
-                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={goToPreviousPage}>
-                    &laquo; Précédent
-                  </button>
-                </li>
-
-                {/* Afficher les numéros de page */}
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-                  <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
-                    <button onClick={() => paginate(number)} className="page-link">
-                      {number}
+          <div className='container'  >
+            {Array.isArray(clients) && clients.length > itemsPerPage && (
+              <nav className="mt-3">
+                <ul className="pagination justify-content-center">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button className="page-link" onClick={goToPreviousPage}>
+                      &laquo; Précédent
                     </button>
                   </li>
-                ))}
 
-                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={goToNextPage}>
-                    Suivant &raquo;
-                  </button>
-                </li>
-              </ul>
+                  {/* Afficher les numéros de page */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                    <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+                      <button onClick={() => paginate(number)} className="page-link">
+                        {number}
+                      </button>
+                    </li>
+                  ))}
 
-              {/* Sélecteur d'éléments par page */}
-              <div className="d-flex justify-content-center align-items-center mt-2">
-                <span className="me-2">Éléments par page:</span>
-                <select
-                  className="form-select form-select-sm w-auto"
-                  value={itemsPerPage}
-                  onChange={(e) => {
-                    setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1); // Reset à la première page quand on change le nombre d'éléments
-                  }}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
-              </div>
-            </nav>
-          )}
-        </div>
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button className="page-link" onClick={goToNextPage}>
+                      Suivant &raquo;
+                    </button>
+                  </li>
+                </ul>
+
+                {/* Sélecteur d'éléments par page */}
+                <div className="d-flex justify-content-center align-items-center mt-2">
+                  <span className="me-2">Éléments par page:</span>
+                  <select
+                    className="form-select form-select-sm w-auto"
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1); // Reset à la première page quand on change le nombre d'éléments
+                    }}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
+              </nav>
+            )}
+          </div>
         </>
       )}
 
@@ -1683,12 +1666,33 @@ const Clients = () => {
               </div>
               <div className="modal-body">
                 <p>Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible.</p>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder='Tapez Votre "Code"'
+                  value={confirmText}
+                  onChange={(e) => setconfirmText(e.target.value)}
+                />
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModalVerify(false)}>Annuler</button>
-                <button type="button" className="btn btn-danger" onClick={() => IdToDelete && deleteClient(IdToDelete)}>
+                {/* <button type="button" className="btn btn-danger" onClick={() =>confirmText == "adminDelete" && IdToDelete && deleteClient(IdToDelete)}>
+                  Supprimer
+                </button> */}
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  disabled={confirmText.trim() !== "adminDelete"}
+                  onClick={() => {
+                    if (confirmText.trim() === "adminDelete" && IdToDelete) {
+                      deleteClient(IdToDelete);
+                      setconfirmText('');
+                    }
+                  }}
+                >
                   Supprimer
                 </button>
+
               </div>
             </div>
           </div>

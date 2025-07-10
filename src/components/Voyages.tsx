@@ -468,20 +468,14 @@ const Voyages = () => {
   // Supprimer un voyage
   const deleteVoyage = async (id: number) => {
     try {
-      console.log(`Tentative de suppression du voyage ID: ${id}`);
       setErrorsApi('');
 
       const response = await API.delete(`/api/dossiers-voyage/${id}`);
 
-      console.log('Réponse de suppression:', response);
 
       // Vérifier si la suppression a réussi
       if (response && (response.status === 200 || response.status === 204 ||
         (response.data && response.data.success))) {
-        console.log('Voyage supprimé avec succès');
-
-        // Afficher un message de succès
-        alert('Voyage supprimé avec succès!');
 
         // Fermer la modal de confirmation
         setShowModalVerify(false);
@@ -772,6 +766,8 @@ const Voyages = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredVoyages]);
+
+  const [confirmText, setconfirmText] = useState('')
 
   return (
     <div className="container py-4">
@@ -1675,12 +1671,32 @@ const Voyages = () => {
                     </div>
                     <div className="modal-body">
                       <p>Êtes-vous sûr de vouloir supprimer ce voyage ? Cette action est irréversible.</p>
+                      <input
+                  type="text"
+                  className="form-control"
+                  placeholder='Tapez Votre "Code"'
+                  value={confirmText}
+                  onChange={(e) => setconfirmText(e.target.value)}
+                />
                     </div>
                     <div className="modal-footer">
                       <button type="button" className="btn btn-secondary" onClick={() => setShowModalVerify(false)}>Annuler</button>
-                      <button type="button" className="btn btn-danger" onClick={() => IdToDelete && deleteVoyage(IdToDelete)}>
+                      {/* <button type="button" className="btn btn-danger" onClick={() => IdToDelete && deleteVoyage(IdToDelete)}>
                         Supprimer
-                      </button>
+                      </button> */}
+                      <button
+                  type="button"
+                  className="btn btn-danger"
+                  disabled={confirmText.trim() !== "adminDelete"}
+                  onClick={() => {
+                    if (confirmText.trim() === "adminDelete" && IdToDelete) {
+                      deleteVoyage(IdToDelete);
+                      setconfirmText('');
+                    }
+                  }}
+                >
+                  Supprimer
+                </button>
                     </div>
                   </div>
                 </div>
