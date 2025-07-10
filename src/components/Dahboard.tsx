@@ -579,7 +579,6 @@ const Dashboard = () => {
       setLoading(false);
       setRefreshing(false);
       
-      // Afficher le message de succès puis le masquer après 3 secondes
       setRefreshSuccess(true);
       setTimeout(() => {
         setRefreshSuccess(false);
@@ -794,9 +793,8 @@ const Dashboard = () => {
               ) : clients.length > 0 ? (
                 (() => {
                   const filteredClients = clients.filter(client => 
-                    clientStatusFilter === 'all' || (client.statut === clientStatusFilter) ||
-                    (client.etat_dossier === clientStatusFilter) 
-                    
+                    clientStatusFilter === 'all' || (client.statut === clientStatusFilter)
+                     || (client.etat_dossier === clientStatusFilter)   
                   );
                   
                   if (filteredClients.length === 0) {
@@ -813,7 +811,7 @@ const Dashboard = () => {
                             <small className="text-muted">{client.email || 'Pas d\'email'}</small>
                           </div>
                           <span className={`badge ${getStatusClass(client.etat_dossier || client.statut)} px-2 py-1 mb-3 mt-2`}>
-                            {translateStatus(client.etat_dossier || client.statut)}
+                            {translateStatus(client.statut || client.etat_dossier)}
                           </span>
                         </div>
                         {index < filteredArray.length - 1 && <hr />}

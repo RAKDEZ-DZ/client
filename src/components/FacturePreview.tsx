@@ -39,7 +39,7 @@ const FacturePreview: React.FC<FacturePreviewProps> = ({ selectedItem, activeTab
     parseFloat(selectedItem.montant.replace(/[^\d,.-]/g, '').replace(',', '.')) : 
     selectedItem.montant || 0;
   
-  const montantTVA = montantHT * 0.2;
+  const montantTVA = 0;
   const montantTTC = montantHT * 1.2;
   const montantRestant = typeof selectedItem.montantRestant === 'string' ? 
     parseFloat(selectedItem.montantRestant.replace(/[^\d,.-]/g, '').replace(',', '.')) : 
@@ -171,17 +171,17 @@ const FacturePreview: React.FC<FacturePreviewProps> = ({ selectedItem, activeTab
           </tbody>
           <tfoot>
             <tr>
-              <th colSpan={3} className="text-end">Total HT</th>
+              <th colSpan={3} className="text-end">Montant Total </th>
               <th className="text-end">{formatMontant(montantHT)}</th>
             </tr>
-            <tr>
+            {/* <tr>
               <th colSpan={3} className="text-end">TVA (20%)</th>
               <th className="text-end">{formatMontant(montantTVA)}</th>
-            </tr>
-            <tr>
+            </tr> */}
+            {/* <tr>
               <th colSpan={3} className="text-end">Total TTC</th>
               <th className="text-end amount-highlight">{formatMontant(montantTTC)}</th>
-            </tr>
+            </tr> */}
             {selectedItem.montantRestant && parseFloat(selectedItem.montantRestant) > 0 && (
               <>
                 <tr>

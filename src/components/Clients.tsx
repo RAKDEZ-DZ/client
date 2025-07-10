@@ -3,8 +3,8 @@ import { CiEdit, CiTrash } from 'react-icons/ci';
 import { FaEye } from 'react-icons/fa';
 import ClientDetailModal from './ClientDetailModal';
 import apiClient, { testApiConnection } from '../api/apiConfig';
-
 import '../App.css';
+
 // Détection de l'environnement pour l'URL de l'API
 const getAPIBaseURL = () => {
   // Utiliser l'adresse IP spécifiée
