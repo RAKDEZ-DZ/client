@@ -1386,7 +1386,7 @@ const Voyages = () => {
             data-bs-keyboard="false" tabIndex={-1} aria-hidden="true">
             <div className="modal-dialog modal-lg">
               <form className="modal-content" onSubmit={(e) => {
-                e.preventDefault();
+                e.preventDefault();s
                 if (IdToUpdate) updateVoyage(IdToUpdate);
               }}>
                 <div className="modal-header">
