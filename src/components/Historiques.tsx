@@ -483,10 +483,10 @@ const Historique = ({ setIsAuthenticated }: any) => {
           </div> */}
 
           <div className="row">
-            <div className="col-md-8 mb-2">
+            <div className="mb-2 text-center">
               <button
                 type="submit"
-                className="btn btn-primary w-100 py-2"
+                className="btn btn-primary w-100 py-2 "
                 disabled={loading || apiStatus !== 'connected'}
               >
                 {loading ? (
