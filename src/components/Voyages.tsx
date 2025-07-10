@@ -167,11 +167,8 @@ const Voyages = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Récupérer tous les dossiers de voyage
   const getVoyages = async () => {
     try {
-      console.log('Tentative de récupération des dossiers de voyage...');
-
       const response = await API.get('/api/dossiers-voyage', {
         headers: {
           'Content-Type': 'application/json'
@@ -179,20 +176,13 @@ const Voyages = () => {
         timeout: 10000
       });
 
-      console.log('Réponse API voyages (status):', response.status);
-
       if (response.data) {
         try {
-          // La réponse API du backend a la structure: { success: true, data: [...] }
           let voyagesData: DossierVoyage[] = [];
 
           if (response.data.success && response.data.data && Array.isArray(response.data.data)) {
-            // Structure API standard du backend
-            console.log(`Nombre de voyages récupérés: ${response.data.data.length}`);
             voyagesData = response.data.data;
           } else if (Array.isArray(response.data)) {
-            // Fallback: les données sont directement dans response.data
-            console.log(`Nombre de voyages récupérés (format direct): ${response.data.length}`);
             voyagesData = response.data;
           } else if (typeof response.data === 'object') {
             // Essayer de trouver le tableau dans les propriétés de l'objet
@@ -200,14 +190,11 @@ const Voyages = () => {
             const arrayKey = possibleArrayKeys.find(key => Array.isArray(response.data[key]));
 
             if (arrayKey) {
-              console.log(`Voyages trouvés dans la propriété "${arrayKey}": ${response.data[arrayKey].length} éléments`);
               voyagesData = response.data[arrayKey];
             } else {
-              console.warn('Structure de réponse API inattendue:', response.data);
               voyagesData = [];
             }
           } else {
-            console.warn('La réponse API contient des données, mais pas sous un format attendu');
             voyagesData = [];
           }
 
@@ -437,13 +424,10 @@ const Voyages = () => {
           nombre_personnes: parseInt(travelFormData.nombre_personnes.toString())
         };
 
-        console.log(`Mise à jour du voyage ID ${id}:`, voyageData);
         const response = await API.put(`/api/dossiers-voyage/${id}`, voyageData);
 
         if (response && response.data) {
-          // Vérifier si la mise à jour a réussi avec la structure API standard
           if (response.data.success || response.status === 200) {
-            alert('Voyage mis à jour avec succès!');
             setTravelFormData({
               client_id: 0,
               type_voyage: '',
@@ -460,8 +444,6 @@ const Voyages = () => {
             });
             setIdToUpdate(null);
             setSelectedVoyage(null);
-
-
             getVoyages();
           } else {
             setErrorsApi('Erreur lors de la mise à jour: Réponse API inattendue');
@@ -666,7 +648,6 @@ const Voyages = () => {
 
   // Charger les voyages et les clients au montage du composant
   useEffect(() => {
-    console.log('Composant monté, chargement des voyages et clients...');
     loadVoyages();
     loadClients(); // Chargement de la liste des clients pour les dropdowns
   }, []);
@@ -722,7 +703,6 @@ const Voyages = () => {
   // Charger la liste des clients depuis l'API
   const loadClients = async () => {
     try {
-      console.log('Chargement de la liste des clients...');
       const response = await API.get('/api/clients', {
         params: {
           limit: 1000  // On récupère un grand nombre de clients pour le dropdown
@@ -751,7 +731,6 @@ const Voyages = () => {
     }
   };
 
-  // Recharger la liste des clients lorsque le composant est monté
   useEffect(() => {
     loadClients();
   }, []);
@@ -769,7 +748,6 @@ const Voyages = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(40);
 
-  // Calcul des données paginées
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentVoyages = Array.isArray(filteredVoyages)
@@ -796,7 +774,6 @@ const Voyages = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredVoyages]);
-
 
   return (
     <div className="container py-4">
@@ -1178,8 +1155,7 @@ const Voyages = () => {
         </div >  */}
 
           {/* Modal d'ajout de voyage */}
-          <div className="modal fade" id="voyageModal" data-bs-backdrop="static"
-            data-bs-keyboard="false" tabIndex={-1} aria-hidden="true">
+          <div className="modal fade" id="voyageModal" tabIndex={-1} aria-hidden="true">
             <div className="modal-dialog modal-lg">
               <form className="modal-content" onSubmit={createVoyage}>
                 <div className="modal-header">
@@ -1386,7 +1362,7 @@ const Voyages = () => {
             data-bs-keyboard="false" tabIndex={-1} aria-hidden="true">
             <div className="modal-dialog modal-lg">
               <form className="modal-content" onSubmit={(e) => {
-                e.preventDefault();s
+                e.preventDefault();
                 if (IdToUpdate) updateVoyage(IdToUpdate);
               }}>
                 <div className="modal-header">
