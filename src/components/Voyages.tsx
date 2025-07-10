@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { CiEdit, CiTrash } from 'react-icons/ci';
 import { FaEye } from 'react-icons/fa';
 import '../App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 // Détection de l'environnement pour l'URL de l'API
 const getAPIBaseURL = () => {
@@ -20,11 +22,6 @@ const API = axios.create({
   timeout: 15000, // 15 secondes
 });
 
-// Log la configuration de l'API
-console.log('Configuration de l\'API:', {
-  baseURL: API.defaults.baseURL,
-  timeout: API.defaults.timeout,
-});
 
 // Intercepteur pour ajouter le token d'authentification à toutes les requêtes
 API.interceptors.request.use((config) => {
@@ -95,7 +92,7 @@ type DossierVoyage = {
 
 // Type pour le formulaire d'ajout/modification de dossier de voyage
 type TravelFormData = {
-  client_id: number;  
+  client_id: number;
   type_voyage: string;
   destination: string;
   date_depart: string;
@@ -127,7 +124,7 @@ const Voyages = () => {
   const [filterTypeVoyage, setFilterTypeVoyage] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
   const [clients, setClients] = useState<Client[]>([]);  // Nouvel état pour stocker la liste des clients
-  
+
   // État pour le formulaire
   const [travelFormData, setTravelFormData] = useState<TravelFormData>({
     client_id: 0,
@@ -143,7 +140,7 @@ const Voyages = () => {
     reste_a_payer: 0,
     notes: ''
   });
-  
+
   // États pour la gestion de l'interface
   const [errors, setErrors] = useState<Partial<TravelFormData>>({});
   const [errorsApi, setErrorsApi] = useState('');
@@ -153,7 +150,7 @@ const Voyages = () => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [selectedVoyage, setSelectedVoyage] = useState<DossierVoyage | null>(null);
-  
+
   // Validation du formulaire
   const validateForm = (): boolean => {
     const newErrors: Partial<TravelFormData> = {};
@@ -174,7 +171,7 @@ const Voyages = () => {
   const getVoyages = async () => {
     try {
       console.log('Tentative de récupération des dossiers de voyage...');
-      
+
       const response = await API.get('/api/dossiers-voyage', {
         headers: {
           'Content-Type': 'application/json'
@@ -183,12 +180,12 @@ const Voyages = () => {
       });
 
       console.log('Réponse API voyages (status):', response.status);
-      
+
       if (response.data) {
         try {
           // La réponse API du backend a la structure: { success: true, data: [...] }
           let voyagesData: DossierVoyage[] = [];
-          
+
           if (response.data.success && response.data.data && Array.isArray(response.data.data)) {
             // Structure API standard du backend
             console.log(`Nombre de voyages récupérés: ${response.data.data.length}`);
@@ -201,7 +198,7 @@ const Voyages = () => {
             // Essayer de trouver le tableau dans les propriétés de l'objet
             const possibleArrayKeys = ['voyages', 'data', 'items', 'results'];
             const arrayKey = possibleArrayKeys.find(key => Array.isArray(response.data[key]));
-            
+
             if (arrayKey) {
               console.log(`Voyages trouvés dans la propriété "${arrayKey}": ${response.data[arrayKey].length} éléments`);
               voyagesData = response.data[arrayKey];
@@ -213,7 +210,7 @@ const Voyages = () => {
             console.warn('La réponse API contient des données, mais pas sous un format attendu');
             voyagesData = [];
           }
-          
+
           // S'assurer que toutes les valeurs requises sont définies
           const safeVoyages = voyagesData.map(voyage => ({
             ...voyage,
@@ -222,7 +219,7 @@ const Voyages = () => {
             reste_a_payer: voyage.reste_a_payer || 0,
             statut: voyage.statut || 'en_cours'
           }));
-          
+
           setVoyages(safeVoyages);
           setFilteredVoyages(safeVoyages); // Initialiser les voyages filtrés
           console.log(`${safeVoyages.length} voyages chargés avec succès`);
@@ -258,8 +255,7 @@ const Voyages = () => {
       try {
         setErrorsApi('');
         setLoading(true);
-        
-        // Préparation des données pour l'envoi à l'API
+
         const voyageData = {
           ...travelFormData,
           // S'assurer que les valeurs numériques sont bien des nombres
@@ -268,35 +264,27 @@ const Voyages = () => {
           reste_a_payer: parseFloat(travelFormData.reste_a_payer.toString()),
           nombre_personnes: parseInt(travelFormData.nombre_personnes.toString(), 10)
         };
-        
-        // Vérification additionnelle des champs requis avant envoi
+
         const requiredFields = ['client_id', 'destination', 'type_voyage', 'date_depart', 'motif_voyage'];
         const missingFields = requiredFields.filter(field => {
           // Utiliser une assertion de type pour accéder dynamiquement aux propriétés
           const value = (voyageData as any)[field];
           return value === undefined || value === null || value === '';
         });
-        
+
         if (missingFields.length > 0) {
           console.error('Champs manquants avant envoi:', missingFields);
           setErrorsApi(`Veuillez remplir tous les champs obligatoires: ${missingFields.join(', ')}`);
           setLoading(false);
           return;
         }
-        
-        console.log('Envoi des données du voyage:', voyageData);
-        
+
+
         const response = await API.post('/api/dossiers-voyage', voyageData);
 
         if (response && response.data) {
-          // Vérifier si la création a réussi avec la structure API standard
           if (response.data.success || response.status === 201) {
-            console.log('Voyage ajouté avec succès:', response.data);
-            
-            // Afficher un message de succès
-            alert('Voyage ajouté avec succès!');
-            
-            // Réinitialiser le formulaire
+
             setTravelFormData({
               client_id: 0,
               type_voyage: '',
@@ -311,28 +299,7 @@ const Voyages = () => {
               reste_a_payer: 0,
               notes: ''
             });
-            
-            // Fermer la modal et rafraîchir la liste
-            try {
-              const modal = document.getElementById('voyageModal');
-              if (modal) {
-                // Vérifier que bootstrap est bien défini
-                if (window && (window as any).bootstrap && (window as any).bootstrap.Modal) {
-                  const bootstrapModal = (window as any).bootstrap.Modal.getInstance(modal);
-                  if (bootstrapModal) bootstrapModal.hide();
-                } else {
-                  console.warn('Bootstrap Modal API n\'est pas disponible');
-                  // Fermeture de secours
-                  const closeButton = modal.querySelector('[data-bs-dismiss="modal"]') as HTMLElement;
-                  if (closeButton) closeButton.click();
-                }
-              }
-            } catch (modalError) {
-              console.error('Erreur lors de la fermeture de la modal:', modalError);
-              // Ne pas bloquer l'exécution en cas d'erreur de fermeture de la modal
-            }
-            
-            // Rafraîchir la liste des voyages
+
             getVoyages();
           } else {
             console.error('Échec de la création du voyage:', response.data);
@@ -344,18 +311,18 @@ const Voyages = () => {
         }
       } catch (error: any) {
         console.error('Erreur lors de l\'ajout du voyage:', error);
-        
+
         let errorMessage = 'Erreur lors de l\'envoi du voyage. Veuillez réessayer.';
         if (error.response && error.response.data) {
           if (error.response.data.message) {
             errorMessage = `Erreur: ${error.response.data.message}`;
-          } 
-          
+          }
+
           // Afficher les champs manquants si disponibles
           if (error.response.data.missing_fields && error.response.data.missing_fields.length > 0) {
             errorMessage += `\nChamps manquants: ${error.response.data.missing_fields.join(', ')}`;
           }
-          
+
           // Afficher l'erreur détaillée si disponible
           if (error.response.data.error) {
             console.error('Détail de l\'erreur:', error.response.data.error);
@@ -364,7 +331,7 @@ const Voyages = () => {
         } else if (error.message) {
           errorMessage = `Erreur: ${error.message}`;
         }
-        
+
         setErrorsApi(errorMessage);
       } finally {
         setLoading(false);
@@ -380,12 +347,12 @@ const Voyages = () => {
     try {
       console.log(`Récupération du voyage avec l'ID: ${id}`);
       setErrorsApi('');
-      
+
       const response = await API.get(`/api/dossiers-voyage/${id}`);
 
       if (response && response.data) {
         let voyageData;
-        
+
         // La réponse API du backend a la structure: { success: true, data: {...} }
         if (response.data.success && response.data.data) {
           voyageData = response.data.data;
@@ -397,15 +364,15 @@ const Voyages = () => {
           setErrorsApi('Structure de données invalide reçue de l\'API');
           return;
         }
-      
+
         console.log('Données du voyage reçues:', voyageData);
-        
+
         if (!voyageData || !voyageData.id) {
           console.error('Aucune donnée de voyage valide reçue');
           setErrorsApi('Voyage introuvable ou données invalides');
           return;
         }
-        
+
         // S'assurer que toutes les valeurs numériques sont définies
         const safeVoyageData = {
           ...voyageData,
@@ -417,15 +384,15 @@ const Voyages = () => {
         };
 
         setSelectedVoyage(safeVoyageData);
-        
+
         // Mise à jour du formulaire avec les données du voyage
         setTravelFormData({
           client_id: safeVoyageData.client_id || 0,
           type_voyage: safeVoyageData.type_voyage || '',
           destination: safeVoyageData.destination || '',
-          date_depart: safeVoyageData.date_depart ? 
+          date_depart: safeVoyageData.date_depart ?
             safeVoyageData.date_depart.substring(0, 10) : '', // Format YYYY-MM-DD
-          date_retour: safeVoyageData.date_retour ? 
+          date_retour: safeVoyageData.date_retour ?
             safeVoyageData.date_retour.substring(0, 10) : '', // Format YYYY-MM-DD
           nombre_personnes: safeVoyageData.nombre_personnes || 1,
           motif_voyage: safeVoyageData.motif_voyage || '',
@@ -443,14 +410,14 @@ const Voyages = () => {
       }
     } catch (error: any) {
       console.error('Erreur lors de la récupération du voyage:', error);
-      
+
       let errorMessage = 'Erreur lors de la récupération du voyage. Veuillez réessayer.';
       if (error.response && error.response.data && error.response.data.message) {
         errorMessage = `Erreur: ${error.response.data.message}`;
       } else if (error.message) {
         errorMessage = `Erreur: ${error.message}`;
       }
-      
+
       setErrorsApi(errorMessage);
     }
   };
@@ -461,7 +428,7 @@ const Voyages = () => {
       try {
         setErrorsApi('');
         setLoading(true);
-        
+
         const voyageData = {
           ...travelFormData,
           prix_total: parseFloat(travelFormData.prix_total.toString()),
@@ -469,7 +436,7 @@ const Voyages = () => {
           reste_a_payer: parseFloat(travelFormData.reste_a_payer.toString()),
           nombre_personnes: parseInt(travelFormData.nombre_personnes.toString())
         };
-        
+
         console.log(`Mise à jour du voyage ID ${id}:`, voyageData);
         const response = await API.put(`/api/dossiers-voyage/${id}`, voyageData);
 
@@ -493,24 +460,8 @@ const Voyages = () => {
             });
             setIdToUpdate(null);
             setSelectedVoyage(null);
-            
-            try {
-              const modal = document.getElementById('EditevoyageModal');
-              if (modal) {
-                // Vérifier que bootstrap est bien défini
-                if (window && (window as any).bootstrap && (window as any).bootstrap.Modal) {
-                  const bootstrapModal = (window as any).bootstrap.Modal.getInstance(modal);
-                  if (bootstrapModal) bootstrapModal.hide();
-                } else {
-                  console.warn('Bootstrap Modal API n\'est pas disponible');
-                  // Fermeture de secours
-                  const closeButton = modal.querySelector('[data-bs-dismiss="modal"]') as HTMLElement;
-                  if (closeButton) closeButton.click();
-                }
-              }
-            } catch (modalError) {
-              console.error('Erreur lors de la fermeture de la modal d\'édition:', modalError);
-            }
+
+
             getVoyages();
           } else {
             setErrorsApi('Erreur lors de la mise à jour: Réponse API inattendue');
@@ -537,23 +488,23 @@ const Voyages = () => {
     try {
       console.log(`Tentative de suppression du voyage ID: ${id}`);
       setErrorsApi('');
-      
+
       const response = await API.delete(`/api/dossiers-voyage/${id}`);
-      
+
       console.log('Réponse de suppression:', response);
-      
+
       // Vérifier si la suppression a réussi
-      if (response && (response.status === 200 || response.status === 204 || 
-          (response.data && response.data.success))) {
+      if (response && (response.status === 200 || response.status === 204 ||
+        (response.data && response.data.success))) {
         console.log('Voyage supprimé avec succès');
-        
+
         // Afficher un message de succès
         alert('Voyage supprimé avec succès!');
-        
+
         // Fermer la modal de confirmation
         setShowModalVerify(false);
         setIdToDelete(null);
-        
+
         // Rafraîchir la liste des voyages
         getVoyages();
       } else {
@@ -562,14 +513,14 @@ const Voyages = () => {
       }
     } catch (error: any) {
       console.error('Erreur lors de la suppression du voyage:', error);
-      
+
       let errorMessage = 'Erreur lors de la suppression du voyage. Veuillez réessayer.';
       if (error.response && error.response.data && error.response.data.message) {
         errorMessage = `Erreur: ${error.response.data.message}`;
       } else if (error.message) {
         errorMessage = `Erreur: ${error.message}`;
       }
-      
+
       setErrorsApi(errorMessage);
       setShowModalVerify(false);
     }
@@ -579,7 +530,7 @@ const Voyages = () => {
   const searchVoyage = () => {
     // Appliquer tous les filtres
     let results = [...voyages];
-    
+
     // Filtre par terme de recherche
     if (searchTerm.trim()) {
       const searchTermLower = searchTerm.toLowerCase().trim();
@@ -588,19 +539,19 @@ const Voyages = () => {
         const destination = voyage.destination ? voyage.destination.toLowerCase() : '';
         const typeVoyage = voyage.type_voyage ? voyage.type_voyage.toLowerCase() : '';
         const motifVoyage = voyage.motif_voyage ? voyage.motif_voyage.toLowerCase() : '';
-        
+
         return clientName.includes(searchTermLower) ||
-              destination.includes(searchTermLower) ||
-              typeVoyage.includes(searchTermLower) ||
-              motifVoyage.includes(searchTermLower);
+          destination.includes(searchTermLower) ||
+          typeVoyage.includes(searchTermLower) ||
+          motifVoyage.includes(searchTermLower);
       });
     }
-    
+
     // Filtre par type de voyage
     if (filterTypeVoyage) {
       results = results.filter(voyage => voyage.type_voyage === filterTypeVoyage);
     }
-    
+
     // Filtre par statut
     if (filterStatut) {
       results = results.filter(voyage => voyage.statut === filterStatut);
@@ -609,7 +560,7 @@ const Voyages = () => {
     setFilteredVoyages(results);
     console.log(`Recherche: ${results.length} résultats trouvés`);
   };
-  
+
   // Réinitialiser tous les filtres
   const resetFilters = () => {
     setSearchTerm('');
@@ -629,7 +580,7 @@ const Voyages = () => {
   ) => {
     const target = e.target;
     const { name, value, type } = target;
-    
+
     // Gestion spéciale pour les champs numériques
     if (type === 'number') {
       // Champs numériques (prix, nombre de personnes, etc.)
@@ -645,25 +596,25 @@ const Voyages = () => {
       }));
     }
   };
-  
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    
+
     // Appliquer tous les filtres
     searchVoyage();
   };
-  
+
   // Gérer les changements de filtre avancé
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
+
     if (name === 'filterTypeVoyage') {
       setFilterTypeVoyage(value);
     } else if (name === 'filterStatut') {
       setFilterStatut(value);
     }
-    
+
     // Appliquer les filtres immédiatement
     setTimeout(() => searchVoyage(), 0);
   };
@@ -673,12 +624,12 @@ const Voyages = () => {
     const prix = parseFloat(travelFormData.prix_total.toString()) || 0;
     const acompte = parseFloat(travelFormData.acompte_verse.toString()) || 0;
     const reste = Math.max(0, prix - acompte); // Empêcher les valeurs négatives
-    
+
     setTravelFormData(prev => ({
       ...prev,
       reste_a_payer: reste
     }));
-    
+
     console.log('Calcul reste à payer:', { prix, acompte, reste });
   };
 
@@ -687,31 +638,7 @@ const Voyages = () => {
     calculateResteAPayer();
   }, [travelFormData.prix_total, travelFormData.acompte_verse]);
 
-  // Initialiser les modals Bootstrap après le montage du composant
-  useEffect(() => {
-    // Vérifier si Bootstrap est disponible
-    if (window && (window as any).bootstrap) {
-      try {
-        // S'assurer que les modals sont correctement initialisées
-        const modalElement = document.getElementById('voyageModal');
-        if (modalElement) {
-          console.log('Initialisation de la modal voyage...');
-          // Création d'une nouvelle instance de Modal si elle n'existe pas déjà
-          if (!(window as any).bootstrap.Modal.getInstance(modalElement)) {
-            new (window as any).bootstrap.Modal(modalElement, {
-              backdrop: 'static',
-              keyboard: false
-            });
-            console.log('Modal voyage initialisée avec succès');
-          }
-        }
-      } catch (error) {
-        console.error('Erreur lors de l\'initialisation des modals Bootstrap:', error);
-      }
-    } else {
-      console.warn('Bootstrap n\'est pas disponible dans la fenêtre globale');
-    }
-  }, []);
+
 
   // Vérifier l'authentification au chargement
   useEffect(() => {
@@ -736,7 +663,7 @@ const Voyages = () => {
       setLoading(false);
     }
   };
-  
+
   // Charger les voyages et les clients au montage du composant
   useEffect(() => {
     console.log('Composant monté, chargement des voyages et clients...');
@@ -747,14 +674,14 @@ const Voyages = () => {
   // Fonction pour afficher les erreurs API - définie comme variable plutôt que comme composant
   const afficherErreurAPI = () => {
     if (!errorsApi) return null;
-    
+
     return (
       <div className="alert alert-danger alert-dismissible fade show mt-3" role="alert">
         <strong>Erreur!</strong> {errorsApi}
-        <button 
-          type="button" 
-          className="btn-close" 
-          data-bs-dismiss="alert" 
+        <button
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="alert"
           aria-label="Close"
           onClick={() => setErrorsApi('')}
         ></button>
@@ -767,7 +694,7 @@ const Voyages = () => {
     if (!status) {
       return <span className="badge bg-secondary">Non défini</span>;
     }
-    
+
     switch (status) {
       case 'confirme':
         return <span className="badge bg-success">Confirmé</span>;
@@ -801,21 +728,21 @@ const Voyages = () => {
           limit: 1000  // On récupère un grand nombre de clients pour le dropdown
         }
       });
-      
+
       let clientsData: Client[] = [];
       if (response.data && response.data.data && Array.isArray(response.data.data)) {
         clientsData = response.data.data;
       } else if (Array.isArray(response.data)) {
         clientsData = response.data;
       }
-      
+
       // Trier les clients par nom puis prénom pour faciliter la recherche
       clientsData.sort((a, b) => {
         const nomComparaison = a.nom.localeCompare(b.nom);
         if (nomComparaison !== 0) return nomComparaison;
         return a.prenom.localeCompare(b.prenom);
       });
-      
+
       setClients(clientsData);
       console.log(`${clientsData.length} clients chargés avec succès`);
     } catch (error) {
@@ -838,6 +765,38 @@ const Voyages = () => {
       </div>
     );
   }
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(40);
+
+  // Calcul des données paginées
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentVoyages = Array.isArray(filteredVoyages)
+    ? filteredVoyages.slice(indexOfFirstItem, indexOfLastItem)
+    : [];
+  const totalPages = Array.isArray(filteredVoyages)
+    ? Math.ceil(filteredVoyages.length / itemsPerPage)
+    : 0;
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredVoyages]);
+
 
   return (
     <div className="container py-4">
@@ -873,7 +832,7 @@ const Voyages = () => {
               <h2 className="fw-bold mb-1">Gestion des Voyages</h2>
               <button className="btn fw-semibold text-light" data-bs-toggle="modal" data-bs-target="#voyageModal"
                 style={{ backgroundColor: "#00AEEF" }}>
-                + nouveau voyage
+                + voyage
               </button>
             </div>
             <div className="d-flex flex-column w-md-auto my-3">
@@ -887,8 +846,8 @@ const Voyages = () => {
                     onChange={handleSearchChange}
                   />
                   {searchTerm && (
-                    <button 
-                      className="btn btn-outline-secondary" 
+                    <button
+                      className="btn btn-outline-secondary"
                       type="button"
                       onClick={() => {
                         setSearchTerm('');
@@ -902,7 +861,7 @@ const Voyages = () => {
                 <button className="btn btn-success fw-semibold" onClick={searchVoyage}>
                   Chercher
                 </button>
-                <button 
+                <button
                   className="btn btn-outline-secondary fw-semibold"
                   type="button"
                   onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
@@ -910,7 +869,7 @@ const Voyages = () => {
                   {showAdvancedFilters ? 'Masquer les filtres' : 'Filtres avancés'}
                 </button>
               </div>
-              
+
               {showAdvancedFilters && (
                 <div className="mt-3 d-flex justify-content-center gap-3">
                   <div className="w-25">
@@ -923,12 +882,11 @@ const Voyages = () => {
                     >
                       <option value="">Tous</option>
                       <option value="tourisme">Tourisme</option>
-                      <option value="affaires">Affaires</option>
+                      <option value="Sans visa">Sans visa</option>
                       <option value="études">Études</option>
-                      <option value="familial">Familial</option>
                     </select>
                   </div>
-                  
+
                   <div className="w-25">
                     <label className="form-label small">Statut</label>
                     <select
@@ -945,9 +903,9 @@ const Voyages = () => {
                       <option value="termine">Terminé</option>
                     </select>
                   </div>
-                  
+
                   <div className="d-flex align-items-end">
-                    <button 
+                    <button
                       className="btn btn-outline-secondary btn-sm"
                       onClick={resetFilters}
                     >
@@ -956,7 +914,7 @@ const Voyages = () => {
                   </div>
                 </div>
               )}
-              
+
               <div className="mt-2 text-center">
                 <small className="text-muted">
                   {filteredVoyages.length} résultat{filteredVoyages.length !== 1 ? 's' : ''} trouvé{filteredVoyages.length !== 1 ? 's' : ''}
@@ -967,7 +925,7 @@ const Voyages = () => {
           </div>
 
           {/* <div className="table-responsive"> */}
-          <div className="position-absolute table-responsive1">
+          {/* <div className="position-absolute table-responsive1">
             {Array.isArray(filteredVoyages) ? (
               <table className="table table-hover align-middle mb-0">
                 <thead className="table-light">
@@ -1045,10 +1003,183 @@ const Voyages = () => {
             ) : (
               <div className="alert alert-info my-4">Impossible de charger les données de voyages</div>
             )}
+          </div> */}
+
+          <div className="position-absolute table-responsive1 mt-5">
+            {Array.isArray(filteredVoyages) ? (
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Destination</th>
+                    <th>Date</th>
+                    <th>Motif voyage</th>
+                    <th>État</th>
+                    <th>Prix</th>
+                    <th>Versé</th>
+                    <th>Reste</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentVoyages.length > 0 ?
+                    currentVoyages.map((voyage, index) => (
+                      <tr key={voyage.id || index}>
+                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td>{voyage.client ? `${voyage.client.nom} ${voyage.client.prenom}` : 'N/A'}</td>
+                        <td>{voyage.type_voyage || 'Non défini'}</td>
+                        <td>{voyage.destination || 'Non défini'}</td>
+                        <td>{voyage.date_depart ? new Date(voyage.date_depart).toLocaleDateString() : 'Non défini'}</td>
+                        <td>{voyage.motif_voyage || 'Non défini'}</td>
+                        <td>{renderStatus(voyage.statut)}</td>
+                        <td>{formatMontant(voyage.prix_total)}</td>
+                        <td>{formatMontant(voyage.acompte_verse)}</td>
+                        <td>{formatMontant(voyage.reste_a_payer)}</td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <button
+                              className="btn btn-outline-primary btn-sm"
+                              data-bs-toggle="modal"
+                              data-bs-target="#modalView"
+                              onClick={() => getVoyageById(voyage.id)}
+                            >
+                              <FaEye />
+                            </button>
+                            <button
+                              className="btn btn-sm btn-success"
+                              data-bs-toggle="modal"
+                              data-bs-target="#EditevoyageModal"
+                              onClick={() => {
+                                setIdToUpdate(voyage.id);
+                                getVoyageById(voyage.id);
+                              }}
+                            >
+                              <CiEdit size={18} />
+                            </button>
+                            <button
+                              className="btn btn-sm btn-danger"
+                              onClick={() => {
+                                setShowModalVerify(true);
+                                setIdToDelete(voyage.id);
+                              }}
+                            >
+                              <CiTrash size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                    :
+                    <tr>
+                      <td colSpan={11} className="text-center py-3">
+                        {filteredVoyages.length === 0 ? 'Aucun voyage trouvé' : 'Aucun voyage sur cette page'}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            ) : (
+              <div className="alert alert-info my-4">Impossible de charger les données de voyages</div>
+            )}
           </div>
 
+          {/* Pagination */}
+          <div className='container'>
+            {Array.isArray(filteredVoyages) && filteredVoyages.length > itemsPerPage && (
+              <nav className="mt-3">
+                <ul className="pagination justify-content-center">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button className="page-link" onClick={goToPreviousPage}>
+                      &laquo; Précédent
+                    </button>
+                  </li>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                    <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+                      <button onClick={() => paginate(number)} className="page-link">
+                        {number}
+                      </button>
+                    </li>
+                  ))}
+
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button className="page-link" onClick={goToNextPage}>
+                      Suivant &raquo;
+                    </button>
+                  </li>
+                </ul>
+
+                <div className="d-flex justify-content-center align-items-center mt-2">
+                  <span className="me-2">Éléments par page:</span>
+                  <select
+                    className="form-select form-select-sm w-auto"
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
+              </nav>
+            )}
+          </div>
+
+          {/* <div className='container'  >
+        {Array.isArray(clients) && clients.length > itemsPerPage && (
+            <nav className="mt-3">
+              <ul className="pagination justify-content-center">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={goToPreviousPage}>
+                    &laquo; Précédent
+                  </button>
+                </li>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+            <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+              <button onClick={() => paginate(number)} className="page-link">
+                {number}
+              </button>
+            </li>
+          ))}
+
+          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+            <button className="page-link" onClick={goToNextPage}>
+              Suivant &raquo;
+            </button>
+          </li>
+        </ul>
+
+      <div className="d-flex justify-content-center align-items-center mt-2">
+        <span className="me-2">Éléments par page:</span>
+        <select
+          className="form-select form-select-sm w-auto"
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(Number(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+      </div>
+    </nav>
+  )
+}
+        </div >  */}
+
           {/* Modal d'ajout de voyage */}
-          <div className="modal fade" id="voyageModal" tabIndex={-1} aria-hidden="true">
+          <div className="modal fade" id="voyageModal" data-bs-backdrop="static"
+            data-bs-keyboard="false" tabIndex={-1} aria-hidden="true">
             <div className="modal-dialog modal-lg">
               <form className="modal-content" onSubmit={createVoyage}>
                 <div className="modal-header">
@@ -1065,7 +1196,7 @@ const Voyages = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Client</label>
                     <select
@@ -1084,7 +1215,7 @@ const Voyages = () => {
                     </select>
                     {errors.client_id && <div className="invalid-feedback">{errors.client_id}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Type de voyage</label>
                     <select
@@ -1096,13 +1227,13 @@ const Voyages = () => {
                     >
                       <option value="">-- Sélectionnez un type --</option>
                       <option value="tourisme">Tourisme</option>
-                      <option value="affaires">Affaires</option>
+                      <option value="Sans visa">Sans visa</option>
                       <option value="études">Études</option>
-                      <option value="familial">Familial</option>
+                      {/* <option value="familial">Familial</option> */}
                     </select>
                     {errors.type_voyage && <div className="invalid-feedback">{errors.type_voyage}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Destination</label>
                     <input
@@ -1116,7 +1247,7 @@ const Voyages = () => {
                     />
                     {errors.destination && <div className="invalid-feedback">{errors.destination}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Date de départ</label>
                     <input
@@ -1129,7 +1260,7 @@ const Voyages = () => {
                     />
                     {errors.date_depart && <div className="invalid-feedback">{errors.date_depart}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Date de retour</label>
                     <input
@@ -1140,7 +1271,7 @@ const Voyages = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Nombre de personnes</label>
                     <input
@@ -1152,7 +1283,7 @@ const Voyages = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Motif du voyage</label>
                     <input
@@ -1166,7 +1297,7 @@ const Voyages = () => {
                     />
                     {errors.motif_voyage && <div className="invalid-feedback">{errors.motif_voyage}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Statut</label>
                     <select
@@ -1182,7 +1313,7 @@ const Voyages = () => {
                       <option value="termine">Terminé</option>
                     </select>
                   </div>
-                  
+
                   <div className="col-md-4">
                     <label className="form-label">Prix total (DA)</label>
                     <input
@@ -1197,7 +1328,7 @@ const Voyages = () => {
                     />
                     {errors.prix_total && <div className="invalid-feedback">{errors.prix_total}</div>}
                   </div>
-                  
+
                   <div className="col-md-4">
                     <label className="form-label">Acompte versé (DA)</label>
                     <input
@@ -1210,7 +1341,7 @@ const Voyages = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  
+
                   <div className="col-md-4">
                     <label className="form-label">Reste à payer (DA)</label>
                     <input
@@ -1222,7 +1353,7 @@ const Voyages = () => {
                       readOnly
                     />
                   </div>
-                  
+
                   <div className="col-md-12">
                     <label className="form-label">Notes</label>
                     <textarea
@@ -1234,7 +1365,7 @@ const Voyages = () => {
                       rows={3}
                     />
                   </div>
-                  
+
                   {/* Message d'erreur API */}
                   {errorsApi && (
                     <div className="col-12">
@@ -1251,7 +1382,8 @@ const Voyages = () => {
           </div>
 
           {/* Modal de modification de voyage */}
-          <div className="modal fade" id="EditevoyageModal" tabIndex={-1} aria-hidden="true">
+          <div className="modal fade" id="EditevoyageModal" data-bs-backdrop="static"
+            data-bs-keyboard="false" tabIndex={-1} aria-hidden="true">
             <div className="modal-dialog modal-lg">
               <form className="modal-content" onSubmit={(e) => {
                 e.preventDefault();
@@ -1271,7 +1403,7 @@ const Voyages = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Mêmes champs que pour l'ajout */}
                   <div className="col-md-6">
                     <label className="form-label">Client</label>
@@ -1291,7 +1423,7 @@ const Voyages = () => {
                     </select>
                     {errors.client_id && <div className="invalid-feedback">{errors.client_id}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Type de voyage</label>
                     <select
@@ -1309,7 +1441,7 @@ const Voyages = () => {
                     </select>
                     {errors.type_voyage && <div className="invalid-feedback">{errors.type_voyage}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Destination</label>
                     <input
@@ -1323,7 +1455,7 @@ const Voyages = () => {
                     />
                     {errors.destination && <div className="invalid-feedback">{errors.destination}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Date de départ</label>
                     <input
@@ -1336,7 +1468,7 @@ const Voyages = () => {
                     />
                     {errors.date_depart && <div className="invalid-feedback">{errors.date_depart}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Date de retour</label>
                     <input
@@ -1347,7 +1479,7 @@ const Voyages = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Nombre de personnes</label>
                     <input
@@ -1359,7 +1491,7 @@ const Voyages = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Motif du voyage</label>
                     <input
@@ -1373,7 +1505,7 @@ const Voyages = () => {
                     />
                     {errors.motif_voyage && <div className="invalid-feedback">{errors.motif_voyage}</div>}
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label className="form-label">Statut</label>
                     <select
@@ -1389,7 +1521,7 @@ const Voyages = () => {
                       <option value="termine">Terminé</option>
                     </select>
                   </div>
-                  
+
                   <div className="col-md-4">
                     <label className="form-label">Prix total (DA)</label>
                     <input
@@ -1404,7 +1536,7 @@ const Voyages = () => {
                     />
                     {errors.prix_total && <div className="invalid-feedback">{errors.prix_total}</div>}
                   </div>
-                  
+
                   <div className="col-md-4">
                     <label className="form-label">Acompte versé (DA)</label>
                     <input
@@ -1417,7 +1549,7 @@ const Voyages = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  
+
                   <div className="col-md-4">
                     <label className="form-label">Reste à payer (DA)</label>
                     <input
@@ -1429,7 +1561,7 @@ const Voyages = () => {
                       readOnly
                     />
                   </div>
-                  
+
                   <div className="col-md-12">
                     <label className="form-label">Notes</label>
                     <textarea
@@ -1460,11 +1592,11 @@ const Voyages = () => {
                 </div>
                 <div className="modal-body">
                   {selectedVoyage ? (
-                    <div 
-                    // id="pdf-content"
-                     className="p-4 bg-white rounded shadow-sm">
+                    <div
+                      // id="pdf-content"
+                      className="p-4 bg-white rounded shadow-sm">
                       <h4 className="mb-3 border-bottom pb-2 text-primary">Détails du voyage</h4>
-                      
+
                       <div className="mb-3 p-3 border-start border-primary border-3 bg-light rounded">
                         <strong className="text-primary">Client:</strong> {selectedVoyage.client ? `${selectedVoyage.client.nom} ${selectedVoyage.client.prenom}` : 'N/A'}
                         {selectedVoyage.client?.telephone && (
@@ -1474,7 +1606,7 @@ const Voyages = () => {
                           <div><strong>Email:</strong> {selectedVoyage.client.email}</div>
                         )}
                       </div>
-                      
+
                       <div className="row mb-3">
                         <div className="col-md-6">
                           <strong>Type:</strong> {selectedVoyage.type_voyage}
@@ -1483,7 +1615,7 @@ const Voyages = () => {
                           <strong>Destination:</strong> {selectedVoyage.destination}
                         </div>
                       </div>
-                      
+
                       <div className="row mb-3">
                         <div className="col-md-6">
                           <strong>Date départ:</strong> {new Date(selectedVoyage.date_depart).toLocaleDateString()}
@@ -1492,7 +1624,7 @@ const Voyages = () => {
                           <strong>Date retour:</strong> {selectedVoyage.date_retour ? new Date(selectedVoyage.date_retour).toLocaleDateString() : 'Non spécifiée'}
                         </div>
                       </div>
-                      
+
                       <div className="row mb-3">
                         <div className="col-md-6">
                           <strong>Nombre de personnes:</strong> {selectedVoyage.nombre_personnes}
@@ -1501,13 +1633,13 @@ const Voyages = () => {
                           <strong>Motif:</strong> {selectedVoyage.motif_voyage}
                         </div>
                       </div>
-                      
+
                       <div className="row mb-3">
                         <div className="col-md-6">
                           <strong>Statut:</strong> {renderStatus(selectedVoyage.statut)}
                         </div>
                       </div>
-                      
+
                       <div className="row mb-3 border-top pt-3 mt-2">
                         <div className="col-md-4">
                           <div className="card bg-light text-center p-2">
@@ -1528,7 +1660,7 @@ const Voyages = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       {selectedVoyage.notes && (
                         <div className="mb-3 border-top pt-3">
                           <strong>Notes:</strong>
@@ -1555,33 +1687,35 @@ const Voyages = () => {
           </div>
 
           {/* Modal de confirmation pour la suppression */}
-          {ShowModalVerify && (
-            <div className="modal fade show d-block"
-              tabIndex={-1}
-              style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1050 }}
-            >
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title text-danger">⛔ Supprimer un voyage</h5>
-                    <button type="button" className="btn-close" onClick={() => setShowModalVerify(false)}></button>
-                  </div>
-                  <div className="modal-body">
-                    <p>Êtes-vous sûr de vouloir supprimer ce voyage ? Cette action est irréversible.</p>
-                  </div>
-                  <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowModalVerify(false)}>Annuler</button>
-                    <button type="button" className="btn btn-danger" onClick={() => IdToDelete && deleteVoyage(IdToDelete)}>
-                      Supprimer
-                    </button>
+          {
+            ShowModalVerify && (
+              <div className="modal fade show d-block"
+                tabIndex={-1}
+                style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1050 }}
+              >
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title text-danger">⛔ Supprimer un voyage</h5>
+                      <button type="button" className="btn-close" onClick={() => setShowModalVerify(false)}></button>
+                    </div>
+                    <div className="modal-body">
+                      <p>Êtes-vous sûr de vouloir supprimer ce voyage ? Cette action est irréversible.</p>
+                    </div>
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-secondary" onClick={() => setShowModalVerify(false)}>Annuler</button>
+                      <button type="button" className="btn btn-danger" onClick={() => IdToDelete && deleteVoyage(IdToDelete)}>
+                        Supprimer
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )
+          }
         </>
       )}
-    </div>
+    </div >
   );
 };
 

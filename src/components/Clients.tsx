@@ -171,7 +171,7 @@ const Clients = () => {
       try {
         console.log('Début de la soumission du formulaire client');
         const formDataToSend = new FormData();
-        
+
         // Ajouter les champs de texte
         Object.entries(formData).forEach(([key, value]) => {
           if (value) {
@@ -179,20 +179,20 @@ const Clients = () => {
             console.log(`Ajout de ${key}:`, value);
           }
         });
-        
+
         // Ajouter les fichiers
         if (selectedFiles.length > 0) {
           console.log(`Ajout de ${selectedFiles.length} fichiers`);
           // Pour multer 2.0.1, le format correct est de simplement utiliser le même nom de champ plusieurs fois
-        selectedFiles.forEach((file) => {
-            formDataToSend.append('documents', file); 
+          selectedFiles.forEach((file) => {
+            formDataToSend.append('documents', file);
             console.log(`Fichier ajouté:`, file.name, file.type, file.size);
           });
         }
 
         // Utiliser notre client API centralisé 
         console.log('Soumission du formulaire avec apiClient');
-        
+
         // Pour FormData, nous devons définir le header Content-Type à undefined pour que axios utilise le bon boundary
         const response = await apiClient.post('/api/clients', formDataToSend, {
           headers: {
@@ -221,15 +221,15 @@ const Clients = () => {
           payement: ''
         });
         setSelectedFiles([]);
-        
+
         // Fermer la modal et rafraîchir la liste
         // closeModal('dossierModal');
-        
+
         // Rafraîchir la liste des clients
         getClients();
       } catch (error: any) {
         console.error('Erreur lors de l\'ajout du client:', error);
-        
+
         // Afficher des informations détaillées sur l'erreur pour le débogage
         if (error.response) {
           // La requête a été faite et le serveur a répondu avec un code d'état
@@ -237,7 +237,7 @@ const Clients = () => {
           console.error('Données de réponse d\'erreur:', error.response.data);
           console.error('Statut d\'erreur:', error.response.status);
           console.error('En-têtes de réponse:', error.response.headers);
-          
+
           // Fournir un message d'erreur plus spécifique basé sur la réponse du serveur
           const errorMessage = error.response.data?.message || error.response.data?.error || 'Erreur lors de l\'envoi du client. Veuillez réessayer.';
           seterrorsApi(`Erreur (${error.response.status}): ${errorMessage}`);
@@ -257,10 +257,10 @@ const Clients = () => {
   const getClients = async () => {
     try {
       console.log('Tentative de récupération des clients...');
-      
+
       // Affiche l'URL complète pour le débogage
       console.log('URL de l\'API:', apiClient.defaults.baseURL + '/api/clients');
-      
+
       // Ajout d'un timeout plus long pour les requêtes
       const response = await apiClient.get('/api/clients', {
         headers: {
@@ -272,7 +272,7 @@ const Clients = () => {
       console.log('Réponse API clients (status):', response.status);
       console.log('Réponse API clients (headers):', response.headers);
       console.log('Réponse API clients (data):', response.data);
-      
+
       // Vérification plus détaillée des données reçues
       if (response.data) {
         if (Array.isArray(response.data)) {
@@ -282,7 +282,7 @@ const Clients = () => {
           // Si c'est un objet mais pas un tableau, vérifier s'il contient une propriété qui pourrait contenir les clients
           const possibleArrayKeys = ['clients', 'data', 'items', 'results'];
           const arrayKey = possibleArrayKeys.find(key => Array.isArray(response.data[key]));
-          
+
           if (arrayKey) {
             console.log(`Clients trouvés dans la propriété "${arrayKey}": ${response.data[arrayKey].length} éléments`);
             setClients(response.data[arrayKey]);
@@ -326,12 +326,12 @@ const Clients = () => {
     try {
       setLoading(true);
       console.log(`Récupération du client avec l'ID: ${id}`);
-      
+
       // Utiliser notre client API centralisé
       console.log('URL de la requête de récupération: /api/clients/' + id);
-      
-      const response = await apiClient.get(`/api/clients/${id}`, { 
-        timeout: 10000 
+
+      const response = await apiClient.get(`/api/clients/${id}`, {
+        timeout: 10000
       });
 
       // Vérifier si la réponse est dans le format attendu
@@ -345,15 +345,15 @@ const Clients = () => {
       } else {
         throw new Error('Format de réponse inattendu');
       }
-      
+
       console.log('Données du client reçues:', clientData);
-      
+
       if (!clientData) {
         console.error('Aucune donnée client reçue');
         seterrorsApi('Client introuvable');
         return;
       }
-      
+
       // Mise à jour du formulaire avec les données du client
       // Utiliser des valeurs par défaut pour tous les champs pour éviter les erreurs null/undefined
       setFormData({
@@ -373,19 +373,19 @@ const Clients = () => {
         notes: clientData.notes || '',
         payement: clientData.payement || ''
       });
-      
+
       // Réinitialiser les fichiers sélectionnés car ils ne sont pas récupérables
       setSelectedFiles([]);
-      
+
       // Définir l'ID pour la mise à jour
       setIdToUpdate(id);
 
       console.log('Client récupéré avec succès:', clientData);
-      
-   
+
+
     } catch (error: any) {
       console.error('Erreur lors de la récupération du client:', error);
-      
+
       let errorMessage = 'Erreur lors de la récupération du client';
       if (error.response) {
         errorMessage += `: ${error.response.status} - ${error.response.data?.message || error.response.statusText}`;
@@ -394,7 +394,7 @@ const Clients = () => {
       } else {
         errorMessage += `: ${error.message}`;
       }
-      
+
       seterrorsApi(errorMessage);
     } finally {
       setLoading(false);
@@ -406,9 +406,9 @@ const Clients = () => {
       try {
         setLoading(true);
         console.log('Début de la mise à jour du client avec ID:', id);
-        
+
         const formDataToSend = new FormData();
-        
+
         // Ajouter tous les champs du formulaire, même vides
         Object.entries(formData).forEach(([key, value]) => {
           // Convertir les valeurs null ou undefined en chaînes vides
@@ -416,10 +416,10 @@ const Clients = () => {
           formDataToSend.append(key, valueToSend);
           console.log(`Ajout du champ ${key}:`, valueToSend);
         });
-        
+
         // Vérifier si formData contient tous les champs
         console.log('FormData créé avec les champs:', [...formDataToSend.entries()].map(([key, value]) => key));
-        
+
         // Gestion des fichiers
         if (selectedFiles.length > 0) {
           console.log(`Ajout de ${selectedFiles.length} fichiers pour la mise à jour`);
@@ -427,15 +427,15 @@ const Clients = () => {
             formDataToSend.append('documents', file);
             console.log(`Fichier ${index + 1} ajouté:`, file.name, file.type, file.size);
           });
-          
+
           // Vérifier que les fichiers sont bien dans FormData
-          console.log('Nombre de champs "documents" dans FormData:', 
+          console.log('Nombre de champs "documents" dans FormData:',
             [...formDataToSend.entries()].filter(([key]) => key === 'documents').length);
         }
 
         // Utiliser notre client API centralisé pour la mise à jour
         console.log('Mise à jour du client avec ID:', id);
-        
+
         // Pour FormData, nous devons définir le header Content-Type à undefined
         const response = await apiClient.put(`/api/clients/${id}`, formDataToSend, {
           headers: {
@@ -443,9 +443,9 @@ const Clients = () => {
           },
           timeout: 30000 // Augmenter le timeout à 30 secondes
         });
-        
+
         console.log('Réponse de mise à jour du client:', response.data);
-        
+
         // Réinitialiser le formulaire
         setFormData({
           nom: '',
@@ -466,17 +466,17 @@ const Clients = () => {
         });
         setSelectedFiles([]);
         setIdToUpdate(null);
-        
+
         // Fermer la modal avec notre fonction utilitaire fiable
         // closeModal('EditedossierModal');
-        
+
         // Rafraîchir la liste des clients
         getClients();
-        
+
         console.log('Client mis à jour avec succès:', response.data);
       } catch (error: any) {
         console.error('Erreur lors de la mise à jour du client:', error);
-        
+
         // Afficher des informations détaillées sur l'erreur pour le débogage
         if (error.response) {
           console.error('Réponse d\'erreur:', {
@@ -493,7 +493,7 @@ const Clients = () => {
           console.error('Erreur de configuration de la requête:', error.message);
           seterrorsApi(`Erreur: ${error.message}`);
         }
-        
+
         // Ne pas fermer la modal pour permettre à l'utilisateur de voir l'erreur et de corriger si nécessaire
       }
     }
@@ -503,37 +503,37 @@ const Clients = () => {
     try {
       setLoading(true);
       console.log(`Suppression du client avec l'ID: ${id}`);
-      
+
       // Utiliser notre client API centralisé
       console.log('Suppression du client: /api/clients/' + id);
-      
-      const response = await apiClient.delete(`/api/clients/${id}`, { 
-        timeout: 10000 
+
+      const response = await apiClient.delete(`/api/clients/${id}`, {
+        timeout: 10000
       });
 
       console.log('Réponse de suppression:', response.data);
-      
+
       // Fermer la modal de confirmation
       setShowModalVerify(false);
       setIdToDelete(null);
-      
+
       // Afficher un message de succès temporaire
       seterrorsApi('');
-      
+
       // Rafraîchir la liste des clients
       getClients();
-      
+
       console.log('Client supprimé avec succès');
     } catch (error: any) {
       console.error('Erreur lors de la suppression du client:', error);
-      
+
       let errorMessage = 'Erreur lors de la suppression du client';
-      
+
       if (error.response) {
         // La requête a été faite et le serveur a répondu avec un code d'état
         console.error('Réponse d\'erreur:', error.response.data);
         errorMessage += `: ${error.response.status} - ${error.response.data?.message || error.response.statusText}`;
-        
+
         // Message spécifique pour les erreurs 403 (interdiction)
         if (error.response.status === 403) {
           errorMessage = 'Vous n\'avez pas les permissions nécessaires pour supprimer ce client';
@@ -553,7 +553,7 @@ const Clients = () => {
         // Une erreur s'est produite lors de la configuration de la requête
         errorMessage += `: ${error.message}`;
       }
-      
+
       // Fermer la modal de confirmation même en cas d'erreur
       setShowModalVerify(false);
       seterrorsApi(errorMessage);
@@ -567,7 +567,7 @@ const Clients = () => {
       getClients();
       return;
     }
-    
+
     try {
       const response = await apiClient.get(`/api/clients/search?q=${searchTerm}`, {
         headers: {
@@ -607,7 +607,7 @@ const Clients = () => {
       }));
     }
   };
-  
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -635,7 +635,7 @@ const Clients = () => {
       setLoading(false);
     }
   };
-  
+
   // Charger les clients au montage du composant
   useEffect(() => {
     console.log('Composant monté, chargement des clients...');
@@ -656,7 +656,7 @@ const Clients = () => {
     }
   };
 
-  
+
 
   // Fonction pour afficher les détails du client
   const showClientDetails = (client: ClientType) => {
@@ -668,29 +668,29 @@ const Clients = () => {
   // Fonction utilitaire pour formater l'URL des documents
   const getDocumentUrl = (url: string | undefined) => {
     if (!url) return '#';
-    
+
     // Si l'URL est déjà complète (commence par http:// ou https://)
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    
+
     // Utiliser la nouvelle route API dédiée aux documents
     const baseUrl = apiClient.defaults.baseURL || 'http://192.168.0.47:3000';
-    
+
     // Extraire juste le nom du fichier, en supprimant les chemins
     const filename = url.split('/').pop() || url;
-    
+
     // Récupérer l'ID du client à partir du contexte actuel
     const clientId = selectedClient?.id;
-    
+
     if (!clientId) {
       console.error('Impossible de générer l\'URL du document: ID client manquant');
       return '#';
     }
-    
+
     // Construire l'URL avec la nouvelle route API
     const formattedUrl = `${baseUrl}/api/documents/${clientId}/${filename}`;
-    
+
     console.log('URL formatée (Clients.tsx):', formattedUrl);
     return formattedUrl;
   };
@@ -699,7 +699,7 @@ const Clients = () => {
   const getDocumentInfo = (doc: any) => {
     // Trouver le nom du document
     const name = doc.name || doc.originalName || doc.filename || 'Document';
-    
+
     // Trouver l'URL du document
     let url = '';
     if (doc.url) url = doc.url;
@@ -722,7 +722,7 @@ const Clients = () => {
       }
     }
     else if (doc.relativePath) url = `/uploads/${doc.relativePath}`;
-    
+
     console.log('Document info:', { name, url });
     return { name, url };
   };
@@ -736,6 +736,33 @@ const Clients = () => {
       </div>
     );
   }
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState(40);
+
+  // Calcul des données paginées
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentClients = Array.isArray(clients) ? clients.slice(indexOfFirstItem, indexOfLastItem) : [];
+  const totalPages = Math.ceil(clients.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [clients]);
 
   return (
     <div className="container py-4">
@@ -765,10 +792,10 @@ const Clients = () => {
           <div className="mb-4">
             <div className="d-flex justify-content-between flex-wrap">
               <h2 className="fw-bold mb-1">Gestion des Clients</h2>
-              <button className="btn fw-semibold" 
-               data-bs-toggle="modal" 
-               data-bs-target="#dossierModal"
-               style={{ backgroundColor: "#00AEEF", color: "white" }}>
+              <button className="btn fw-semibold"
+                data-bs-toggle="modal"
+                data-bs-target="#dossierModal"
+                style={{ backgroundColor: "#00AEEF", color: "white" }}>
                 + client
               </button>
             </div>
@@ -786,25 +813,25 @@ const Clients = () => {
             </div>
           </div>
 
-      {/* <div className="table-responsive"> */}
-      <div className="position-absolute table-responsive ">
-        {Array.isArray(clients) ? (
-          // <table className="table table-hover align-middle mb-0">
-          <table className="table table-hover align-middle mb-0">
-            <thead className="table-light">
-              <tr>
-                <th>#</th>
-                <th>Nom & Prénom</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Type de visa</th>
-                <th>Statut</th>
-                <th>Documents</th>
-                <th>Paiement</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-          <tbody>
+          {/* <div className="table-responsive"> */}
+          <div className="position-absolute table-responsive mt-5 h-100">
+            {Array.isArray(clients) ? (
+              // <table className="table table-hover align-middle mb-0">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Nom & Prénom</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Type de visa</th>
+                    <th>Statut</th>
+                    <th>Documents</th>
+                    <th>Paiement</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                {/* <tbody>
             {Array.isArray(clients) && clients.length > 0 ? (
               clients.map((client, index) => (
                 <tr key={client.id || index}>
@@ -942,14 +969,356 @@ const Clients = () => {
                   Aucun client trouvé
                 </td>
               </tr>
-            )}          </tbody>
-        </table>
-        ) : (
-          <div className="alert alert-info my-4">Impossible de charger les données client</div>
-        )}
-      </div>
+            )}          </tbody> */}
+
+                {/* <tbody>
+  {Array.isArray(clients) && clients.length > 0 ? (
+    currentClients.length > 0 ? (
+      <tr key={currentClients[0].id || 0}>
+        <td>{currentPage}</td> 
+        <td>{`${currentClients[0].nom || ''} ${currentClients[0].prenom || ''}`}</td>
+        <td>{currentClients[0].email || ''}</td>
+        <td>{currentClients[0].telephone || ''}</td>
+        <td>{currentClients[0].type_visa || ''}</td>
+        <td>
+          {currentClients[0].statut ? (
+            <span className={`badge ${
+              currentClients[0].statut === 'nouveau' || currentClients[0].statut === 'inscrit' ? 'bg-info' :
+              currentClients[0].statut === 'en_cours' ? 'bg-primary' :
+              currentClients[0].statut === 'incomplet' ? 'bg-warning' :
+              currentClients[0].statut === 'admission_recu' ? 'bg-success' :
+              currentClients[0].statut === 'refus' ? 'bg-danger' :
+              currentClients[0].statut === 'accepter' ? 'bg-success' :
+              currentClients[0].statut === 'partie_visa' ? 'bg-secondary' :
+              currentClients[0].statut === 'terminer' ? 'bg-dark' : 'bg-secondary'
+            }`}>
+              {currentClients[0].statut === 'nouveau' ? 'Nouveau' :
+               currentClients[0].statut === 'inscrit' ? 'Inscrit' :
+               currentClients[0].statut === 'en_cours' ? 'En cours' :
+               currentClients[0].statut === 'incomplet' ? 'Incomplet' :
+               currentClients[0].statut === 'admission_recu' ? 'Admission reçue' :
+               currentClients[0].statut === 'refus' ? 'Refusé' :
+               currentClients[0].statut === 'accepter' ? 'Accepté' :
+               currentClients[0].statut === 'partie_visa' ? 'Partie visa' :
+               currentClients[0].statut === 'terminer' ? 'Terminé' : currentClients[0].statut}
+            </span>
+          ) : ''}
+        </td>
+        <td>
+          {Array.isArray(currentClients[0].documents) ? (
+            <div className="dropdown">
+              <button className="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                {currentClients[0].documents.length} fichier(s)
+              </button>
+              <ul className="dropdown-menu">
+                {currentClients[0].documents.length > 0 ? (
+                  currentClients[0].documents.map((doc, idx) => {
+                    const { name, url } = getDocumentInfo(doc);
+                    return (
+                      <li key={idx}>
+                        <a className="dropdown-item" download={name} 
+                        href={`../../../backend/uploads/${name}`}
+                         target="_blank" rel="noopener noreferrer">
+                          {name}
+                        </a>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li><span className="dropdown-item text-muted">Aucun document</span></li>
+                )}
+                <li><hr className="dropdown-divider" /></li>
+                <li>
+                  <button 
+                    className="dropdown-item text-primary" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#EditedossierModal"
+                    onClick={() => {
+                      if (currentClients[0].id) {
+                        setIdToUpdate(currentClients[0].id);
+                        getClientById(currentClients[0].id);
+                      }
+                    }}
+                  >
+                    Ajouter un document
+                  </button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <button 
+              className="btn btn-sm btn-outline-primary"
+              data-bs-toggle="modal" 
+              data-bs-target="#EditedossierModal"
+              onClick={() => {
+                if (currentClients[0].id) {
+                  setIdToUpdate(currentClients[0].id);
+                  getClientById(currentClients[0].id);
+                }
+              }}
+            >
+              Ajouter
+            </button>
+          )}
+        </td>
+        <td>{currentClients[0].payement ? renderPaymentStatus(currentClients[0].payement) : ''}</td>
+        <td>
+          <div className="d-flex gap-2">
+            <button 
+              className="btn btn-sm btn-info"  
+              onClick={() => {
+                if (currentClients[0]) {
+                  showClientDetails(currentClients[0]);
+                }
+              }}
+              title="Voir les détails du client">
+              <FaEye size={18} />
+            </button>
+            <button 
+              className="btn btn-sm btn-success"
+              data-bs-toggle="modal" 
+              data-bs-target="#EditedossierModal"
+              onClick={() => {
+                if (currentClients[0].id) {
+                  getClientById(currentClients[0].id);
+                }
+              }}
+              title="Modifier ce client">
+              <CiEdit size={18} />
+            </button>
+            <button 
+              className="btn btn-sm btn-danger"  
+              onClick={() => {
+                if (currentClients[0].id) {
+                  console.log('Demande de suppression du client avec ID:', currentClients[0].id);
+                  setIdToDelete(currentClients[0].id);
+                  setShowModalVerify(true);
+                }
+              }}
+              title="Supprimer ce client">
+              <CiTrash size={18} />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ) : (
+      <tr>
+        <td colSpan={9} className="text-center py-3">
+          Aucun client à afficher sur cette page
+        </td>
+      </tr>
+    )
+  ) : (
+    <tr>
+      <td colSpan={9} className="text-center py-3">
+        Aucun client trouvé
+      </td>
+    </tr>
+  )}
+</tbody> */}
+
+                <tbody>
+                  {Array.isArray(clients) && clients.length > 0 ? (
+                    currentClients.length > 0 ? (
+                      currentClients.map((client, index) => (
+                        <tr key={client.id || index}>
+                          <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                          <td>{`${client.nom || ''} ${client.prenom || ''}`}</td>
+                          <td>{client.email || ''}</td>
+                          <td>{client.telephone || ''}</td>
+                          <td>{client.type_visa || ''}</td>
+                          <td>
+                            {client.statut ? (
+                              <span className={`badge ${client.statut === 'nouveau' || client.statut === 'inscrit' ? 'bg-info' :
+                                  client.statut === 'en_cours' ? 'bg-primary' :
+                                    client.statut === 'incomplet' ? 'bg-warning' :
+                                      client.statut === 'admission_recu' ? 'bg-success' :
+                                        client.statut === 'refus' ? 'bg-danger' :
+                                          client.statut === 'accepter' ? 'bg-success' :
+                                            client.statut === 'partie_visa' ? 'bg-secondary' :
+                                              client.statut === 'terminer' ? 'bg-dark' : 'bg-secondary'
+                                }`}>
+                                {client.statut === 'nouveau' ? 'Nouveau' :
+                                  client.statut === 'inscrit' ? 'Inscrit' :
+                                    client.statut === 'en_cours' ? 'En cours' :
+                                      client.statut === 'incomplet' ? 'Incomplet' :
+                                        client.statut === 'admission_recu' ? 'Admission reçue' :
+                                          client.statut === 'refus' ? 'Refusé' :
+                                            client.statut === 'accepter' ? 'Accepté' :
+                                              client.statut === 'partie_visa' ? 'Partie visa' :
+                                                client.statut === 'terminer' ? 'Terminé' : client.statut}
+                              </span>
+                            ) : ''}
+                          </td>
+                          <td>
+                            {Array.isArray(client.documents) ? (
+                              <div className="dropdown">
+                                <button className="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                  {client.documents.length} fichier(s)
+                                </button>
+                                <ul className="dropdown-menu">
+                                  {client.documents.length > 0 ? (
+                                    client.documents.map((doc, idx) => {
+                                      const { name, url } = getDocumentInfo(doc);
+                                      return (
+                                        <li key={idx}>
+                                          <a className="dropdown-item" download={name}
+                                            href={`../../../backend/uploads/${name}`}
+                                            target="_blank" rel="noopener noreferrer">
+                                            {name}
+                                          </a>
+                                        </li>
+                                      );
+                                    })
+                                  ) : (
+                                    <li><span className="dropdown-item text-muted">Aucun document</span></li>
+                                  )}
+                                  <li><hr className="dropdown-divider" /></li>
+                                  <li>
+                                    <button
+                                      className="dropdown-item text-primary"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#EditedossierModal"
+                                      onClick={() => {
+                                        if (client.id) {
+                                          setIdToUpdate(client.id);
+                                          getClientById(client.id);
+                                        }
+                                      }}
+                                    >
+                                      Ajouter un document
+                                    </button>
+                                  </li>
+                                </ul>
+                              </div>
+                            ) : (
+                              <button
+                                className="btn btn-sm btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#EditedossierModal"
+                                onClick={() => {
+                                  if (client.id) {
+                                    setIdToUpdate(client.id);
+                                    getClientById(client.id);
+                                  }
+                                }}
+                              >
+                                Ajouter
+                              </button>
+                            )}
+                          </td>
+                          <td>{client.payement ? renderPaymentStatus(client.payement) : ''}</td>
+                          <td>
+                            <div className="d-flex gap-2">
+                              <button
+                                className="btn btn-sm btn-info"
+                                onClick={() => {
+                                  if (client) {
+                                    showClientDetails(client);
+                                  }
+                                }}
+                                title="Voir les détails du client">
+                                <FaEye size={18} />
+                              </button>
+                              <button
+                                className="btn btn-sm btn-success"
+                                data-bs-toggle="modal"
+                                data-bs-target="#EditedossierModal"
+                                onClick={() => {
+                                  if (client.id) {
+                                    getClientById(client.id);
+                                  }
+                                }}
+                                title="Modifier ce client">
+                                <CiEdit size={18} />
+                              </button>
+                              <button
+                                className="btn btn-sm btn-danger"
+                                onClick={() => {
+                                  if (client.id) {
+                                    console.log('Demande de suppression du client avec ID:', client.id);
+                                    setIdToDelete(client.id);
+                                    setShowModalVerify(true);
+                                  }
+                                }}
+                                title="Supprimer ce client">
+                                <CiTrash size={18} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={9} className="text-center py-3">
+                          Aucun client à afficher sur cette page
+                        </td>
+                      </tr>
+                    )
+                  ) : (
+                    <tr>
+                      <td colSpan={9} className="text-center py-3">
+                        Aucun client trouvé
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+
+              </table>
+            ) : (
+              <div className="alert alert-info my-4">Impossible de charger les données client</div>
+            )}
+          </div>
+
+        <div className='container'  >
+        {Array.isArray(clients) && clients.length > itemsPerPage && (
+            <nav className="mt-3">
+              <ul className="pagination justify-content-center">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={goToPreviousPage}>
+                    &laquo; Précédent
+                  </button>
+                </li>
+
+                {/* Afficher les numéros de page */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                  <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+                    <button onClick={() => paginate(number)} className="page-link">
+                      {number}
+                    </button>
+                  </li>
+                ))}
+
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={goToNextPage}>
+                    Suivant &raquo;
+                  </button>
+                </li>
+              </ul>
+
+              {/* Sélecteur d'éléments par page */}
+              <div className="d-flex justify-content-center align-items-center mt-2">
+                <span className="me-2">Éléments par page:</span>
+                <select
+                  className="form-select form-select-sm w-auto"
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1); // Reset à la première page quand on change le nombre d'éléments
+                  }}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+            </nav>
+          )}
+        </div>
         </>
       )}
+
 
       {/*     mommmmmmmdalllll */}
 
@@ -1058,7 +1427,7 @@ const Clients = () => {
                 </select>
                 {errors.type_visa && <div className="invalid-feedback">{errors.type_visa}</div>}
               </div>
-            
+
               <div className="col-md-6">
                 <label className="form-label">Statut de paiement</label>
                 <select
@@ -1075,7 +1444,7 @@ const Clients = () => {
                 </select>
                 {errors.payement && <div className="invalid-feedback">{errors.payement}</div>}
               </div>
-              
+
               {/* Champs pour visa étudiant */}
               {formData.type_visa === 'études' && (
                 <>
@@ -1164,7 +1533,7 @@ const Clients = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              
+
               {/* Notes */}
               <div className="col-md-12">
                 <label className="form-label">Notes</label>
@@ -1177,7 +1546,7 @@ const Clients = () => {
                   rows={3}
                 />
               </div>
-              
+
               {/* Message d'erreur API */}
               {errorsApi && (
                 <div className="col-12">
@@ -1292,7 +1661,7 @@ const Clients = () => {
                 </select>
                 {errors.payement && <div className="invalid-feedback">{errors.payement}</div>}
               </div>
-              
+
               {/* Documents */}
               <div className="col-md-12">
                 <label className="form-label">Documents (nouveaux documents)</label>
@@ -1311,7 +1680,7 @@ const Clients = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              
+
               {/* Message d'erreur API dans le formulaire d'édition */}
               {errorsApi && (
                 <div className="col-12 mt-3">
@@ -1362,9 +1731,9 @@ const Clients = () => {
 
       {/* Utilisation du composant ClientDetailModal */}
       {showDetailModal && (
-        <ClientDetailModal 
-          client={selectedClient} 
-          onClose={() => setShowDetailModal(false)} 
+        <ClientDetailModal
+          client={selectedClient}
+          onClose={() => setShowDetailModal(false)}
         />
       )}
 
