@@ -194,7 +194,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, onClose }
                         <p><strong>Téléphone:</strong> {client.telephone}</p>
                         <p><strong>Statut:</strong> {formatStatus(client.statut)}</p>
                         <p><strong>Paiement:</strong> {renderPaymentStatus(client.payement)}</p>
-                        <p><strong>password:</strong> {client.email}</p>
+                        <p><strong>mot de passe:</strong> {client.mot_de_passe}</p>
                       </div>
                     </div>
                   </div>

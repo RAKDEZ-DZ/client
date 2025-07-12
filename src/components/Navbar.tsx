@@ -42,6 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
   };
   
   const handleLogout = () => {
+    setActiveComponents("Dashboard")
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     localStorage.removeItem("userPermissions");

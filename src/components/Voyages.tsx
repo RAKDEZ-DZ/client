@@ -844,7 +844,7 @@ const Voyages = () => {
               {showAdvancedFilters && (
                 <div className="mt-3 d-flex justify-content-center gap-3">
                   <div className="w-25">
-                    <label className="form-label small">Type de voyage</label>
+                    <label className="form-label fw-bold small">Type de voyage</label>
                     <select
                       name="filterTypeVoyage"
                       className="form-select"
@@ -859,7 +859,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="w-25">
-                    <label className="form-label small">Statut</label>
+                    <label className="form-label fw-bold small">Statut</label>
                     <select
                       name="filterStatut"
                       className="form-select"
@@ -1168,7 +1168,7 @@ const Voyages = () => {
                   )}
 
                   <div className="col-md-6">
-                    <label className="form-label">Client</label>
+                    <label className="form-label fw-bold">Client</label>
                     <select
                       name="client_id"
                       className={`form-select ${errors.client_id ? 'is-invalid' : ''}`}
@@ -1187,7 +1187,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Type de voyage</label>
+                    <label className="form-label fw-bold">Type de voyage</label>
                     <select
                       name="type_voyage"
                       className={`form-select ${errors.type_voyage ? 'is-invalid' : ''}`}
@@ -1205,7 +1205,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Destination</label>
+                    <label className="form-label fw-bold">Destination</label>
                     <input
                       name="destination"
                       type="text"
@@ -1219,7 +1219,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Date de départ</label>
+                    <label className="form-label fw-bold">Date de départ</label>
                     <input
                       name="date_depart"
                       type="date"
@@ -1232,7 +1232,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Date de retour</label>
+                    <label className="form-label fw-bold">Date de retour</label>
                     <input
                       name="date_retour"
                       type="date"
@@ -1243,7 +1243,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Nombre de personnes</label>
+                    <label className="form-label fw-bold">Nombre de personnes</label>
                     <input
                       name="nombre_personnes"
                       type="number"
@@ -1255,7 +1255,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Motif du voyage</label>
+                    <label className="form-label fw-bold">Motif du voyage</label>
                     <input
                       name="motif_voyage"
                       type="text"
@@ -1269,7 +1269,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Statut</label>
+                    <label className="form-label fw-bold">Statut</label>
                     <select
                       name="statut"
                       className="form-select"
@@ -1285,11 +1285,11 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Prix total (DA)</label>
+                    <label className="form-label fw-bold">Prix total (DA)</label>
                     <input
                       name="prix_total"
                       type="number"
-                      step="0.01"
+                      step="100"
                       className={`form-control ${errors.prix_total ? 'is-invalid' : ''}`}
                       placeholder="Saisissez le prix..."
                       value={travelFormData.prix_total}
@@ -1300,11 +1300,11 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Acompte versé (DA)</label>
+                    <label className="form-label fw-bold">Acompte versé (DA)</label>
                     <input
                       name="acompte_verse"
                       type="number"
-                      step="0.01"
+                      step="100"
                       className="form-control"
                       placeholder="Saisissez l'acompte..."
                       value={travelFormData.acompte_verse}
@@ -1313,11 +1313,11 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Reste à payer (DA)</label>
+                    <label className="form-label fw-bold">Reste à payer (DA)</label>
                     <input
                       name="reste_a_payer"
                       type="number"
-                      step="0.01"
+                      step="100"
                       className="form-control"
                       value={travelFormData.reste_a_payer}
                       readOnly
@@ -1325,7 +1325,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-12">
-                    <label className="form-label">Notes</label>
+                    <label className="form-label fw-bold">Notes</label>
                     <textarea
                       name="notes"
                       className="form-control"
@@ -1376,7 +1376,7 @@ const Voyages = () => {
 
                   {/* Mêmes champs que pour l'ajout */}
                   <div className="col-md-6">
-                    <label className="form-label">Client</label>
+                    <label className="form-label fw-bold">Client</label>
                     <select
                       name="client_id"
                       className={`form-select ${errors.client_id ? 'is-invalid' : ''}`}
@@ -1395,7 +1395,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Type de voyage</label>
+                    <label className="form-label fw-bold">Type de voyage</label>
                     <select
                       name="type_voyage"
                       className={`form-select ${errors.type_voyage ? 'is-invalid' : ''}`}
@@ -1405,15 +1405,15 @@ const Voyages = () => {
                     >
                       <option value="">-- Sélectionnez un type --</option>
                       <option value="tourisme">Tourisme</option>
-                      <option value="affaires">Affaires</option>
+                      <option value="Sans visa">Sans visa</option>
                       <option value="études">Études</option>
-                      <option value="familial">Familial</option>
+                      {/* <option value="familial">Familial</option> */}
                     </select>
                     {errors.type_voyage && <div className="invalid-feedback">{errors.type_voyage}</div>}
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Destination</label>
+                    <label className="form-label fw-bold">Destination</label>
                     <input
                       name="destination"
                       type="text"
@@ -1427,7 +1427,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Date de départ</label>
+                    <label className="form-label fw-bold">Date de départ</label>
                     <input
                       name="date_depart"
                       type="date"
@@ -1440,7 +1440,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Date de retour</label>
+                    <label className="form-label fw-bold">Date de retour</label>
                     <input
                       name="date_retour"
                       type="date"
@@ -1451,7 +1451,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Nombre de personnes</label>
+                    <label className="form-label fw-bold">Nombre de personnes</label>
                     <input
                       name="nombre_personnes"
                       type="number"
@@ -1463,7 +1463,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Motif du voyage</label>
+                    <label className="form-label fw-bold">Motif du voyage</label>
                     <input
                       name="motif_voyage"
                       type="text"
@@ -1477,7 +1477,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Statut</label>
+                    <label className="form-label fw-bold">Statut</label>
                     <select
                       name="statut"
                       className="form-select"
@@ -1493,11 +1493,11 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Prix total (DA)</label>
+                    <label className="form-label fw-bold">Prix total (DA)</label>
                     <input
                       name="prix_total"
                       type="number"
-                      step="0.01"
+                      step="100"
                       className={`form-control ${errors.prix_total ? 'is-invalid' : ''}`}
                       placeholder="Saisissez le prix..."
                       value={travelFormData.prix_total}
@@ -1508,11 +1508,11 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Acompte versé (DA)</label>
+                    <label className="form-label fw-bold">Acompte versé (DA)</label>
                     <input
                       name="acompte_verse"
                       type="number"
-                      step="0.01"
+                      step="100"
                       className="form-control"
                       placeholder="Saisissez l'acompte..."
                       value={travelFormData.acompte_verse}
@@ -1521,11 +1521,11 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Reste à payer (DA)</label>
+                    <label className="form-label fw-bold">Reste à payer (DA)</label>
                     <input
                       name="reste_a_payer"
                       type="number"
-                      step="0.01"
+                      step="100"
                       className="form-control"
                       value={travelFormData.reste_a_payer}
                       readOnly
@@ -1533,7 +1533,7 @@ const Voyages = () => {
                   </div>
 
                   <div className="col-md-12">
-                    <label className="form-label">Notes</label>
+                    <label className="form-label fw-bold">Notes</label>
                     <textarea
                       name="notes"
                       className="form-control"

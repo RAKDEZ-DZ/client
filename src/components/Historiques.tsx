@@ -13,7 +13,6 @@ const Historique = ({ setIsAuthenticated }: any) => {
   const [loading, setLoading] = useState(false);
   const [apiStatus, setApiStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
 
-  // État pour les permissions
   const [permissions, setPermissions] = useState({
     factures: false,
     clients: false,
@@ -44,7 +43,6 @@ const Historique = ({ setIsAuthenticated }: any) => {
       const response = await apiClient.get('/api/users/permissions');
 
       console.log('Connexion à l\'API réussie:', response.data);
-      setSuccessMessage('Connexion à l\'API réussie! URL: ' + apiClient.defaults.baseURL);
       setApiStatus('connected');
       return true;
     } catch (err: any) {

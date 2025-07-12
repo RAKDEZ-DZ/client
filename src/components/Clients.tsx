@@ -2,16 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { CiEdit, CiTrash } from 'react-icons/ci';
 import { FaEye } from 'react-icons/fa';
 import ClientDetailModal from './ClientDetailModal';
-import apiClient, { testApiConnection } from '../api/apiConfig';
+import apiClient from '../api/apiConfig';
 import '../App.css';
+import axios from 'axios';
 
-// Détection de l'environnement pour l'URL de l'API
-const getAPIBaseURL = () => {
-  // Utiliser l'adresse IP spécifiée
-  return 'https://backend1-lz19.onrender.com';
-};
-
-// Intercepteur pour ajouter le token d'authentification à toutes les requêtes
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
@@ -138,7 +132,6 @@ const Clients = () => {
   const [loading, setLoading] = useState(true);
   // État pour suivre si l'utilisateur est authentifié
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
 
@@ -153,14 +146,14 @@ const Clients = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const [addedText, setaddedText] = useState('')
+  const [success, setsuccess] = useState(false)
   const handleDossierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     if (validateForm()) {
       try {
-        console.log('Début de la soumission du formulaire client');
         const formDataToSend = new FormData();
-
-        // Ajouter les champs de texte
         Object.entries(formData).forEach(([key, value]) => {
           if (value) {
             formDataToSend.append(key, value.toString());
@@ -168,29 +161,23 @@ const Clients = () => {
           }
         });
 
-        // Ajouter les fichiers
         if (selectedFiles.length > 0) {
           console.log(`Ajout de ${selectedFiles.length} fichiers`);
-          // Pour multer 2.0.1, le format correct est de simplement utiliser le même nom de champ plusieurs fois
           selectedFiles.forEach((file) => {
             formDataToSend.append('documents', file);
             console.log(`Fichier ajouté:`, file.name, file.type, file.size);
           });
         }
 
-        // Utiliser notre client API centralisé 
-        console.log('Soumission du formulaire avec apiClient');
-
-        // Pour FormData, nous devons définir le header Content-Type à undefined pour que axios utilise le bon boundary
         const response = await apiClient.post('/api/clients', formDataToSend, {
           headers: {
-            'Content-Type': undefined // Nécessaire pour que axios définisse le bon Content-Type multipart/form-data avec boundary
-          },
-          timeout: 30000 // Augmenter le timeout à 30 secondes
+            'Content-Type': undefined
+          }
         });
 
         console.log('Client ajouté avec succès:', response.data);
-        // Réinitialiser le formulaire
+        setaddedText("Client ajouté avec succès")
+
         setFormData({
           nom: '',
           prenom: '',
@@ -210,34 +197,23 @@ const Clients = () => {
         });
         setSelectedFiles([]);
 
-        // Fermer la modal et rafraîchir la liste
-        // closeModal('dossierModal');
-
-        // Rafraîchir la liste des clients
         getClients();
+        setsuccess(true)
       } catch (error: any) {
         console.error('Erreur lors de l\'ajout du client:', error);
 
-        // Afficher des informations détaillées sur l'erreur pour le débogage
         if (error.response) {
-          // La requête a été faite et le serveur a répondu avec un code d'état
-          // qui n'est pas dans la plage 2xx
-          console.error('Données de réponse d\'erreur:', error.response.data);
-          console.error('Statut d\'erreur:', error.response.status);
-          console.error('En-têtes de réponse:', error.response.headers);
-
-          // Fournir un message d'erreur plus spécifique basé sur la réponse du serveur
           const errorMessage = error.response.data?.message || error.response.data?.error || 'Erreur lors de l\'envoi du client. Veuillez réessayer.';
           seterrorsApi(`Erreur (${error.response.status}): ${errorMessage}`);
         } else if (error.request) {
-          // La requête a été faite mais aucune réponse n'a été reçue
           console.error('Aucune réponse reçue:', error.request);
           seterrorsApi('Le serveur n\'a pas répondu. Vérifiez votre connexion internet ou contactez l\'administrateur.');
         } else {
-          // Une erreur s'est produite lors de la configuration de la requête
           console.error('Erreur de configuration de la requête:', error.message);
           seterrorsApi(`Erreur: ${error.message}`);
         }
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -253,7 +229,7 @@ const Clients = () => {
 
       if (response.data) {
         if (Array.isArray(response.data)) {
-          console.log(`Nombre de clients récupérés: ${response.data.length}`);
+          console.log(`Nombre de clients récupérés: ${response.data}`);
           setClients(response.data);
         } else if (typeof response.data === 'object') {
           // Si c'est un objet mais pas un tableau, vérifier s'il contient une propriété qui pourrait contenir les clients
@@ -303,12 +279,9 @@ const Clients = () => {
       setLoading(true);
       console.log(`Récupération du client avec l'ID: ${id}`);
 
-      // Utiliser notre client API centralisé
       console.log('URL de la requête de récupération: /api/clients/' + id);
 
-      const response = await apiClient.get(`/api/clients/${id}`, {
-        timeout: 10000
-      });
+      const response = await apiClient.get(`/api/clients/${id}`);
 
       // Vérifier si la réponse est dans le format attendu
       let clientData;
@@ -330,8 +303,6 @@ const Clients = () => {
         return;
       }
 
-      // Mise à jour du formulaire avec les données du client
-      // Utiliser des valeurs par défaut pour tous les champs pour éviter les erreurs null/undefined
       setFormData({
         nom: clientData.nom || '',
         prenom: clientData.prenom || '',
@@ -340,7 +311,7 @@ const Clients = () => {
         type_visa: clientData.type_visa || '',
         etat_dossier: clientData.etat_dossier || '',
         email_creer: clientData.email_creer || '',
-        mot_de_passe: '', // Ne pas afficher le mot de passe existant pour des raisons de sécurité
+        mot_de_passe: '',
         universite_destination: clientData.universite_destination || '',
         pays_destination: clientData.pays_destination || '',
         programme_etude: clientData.programme_etude || '',
@@ -350,10 +321,8 @@ const Clients = () => {
         payement: clientData.payement || ''
       });
 
-      // Réinitialiser les fichiers sélectionnés car ils ne sont pas récupérables
       setSelectedFiles([]);
 
-      // Définir l'ID pour la mise à jour
       setIdToUpdate(id);
 
       console.log('Client récupéré avec succès:', clientData);
@@ -377,80 +346,186 @@ const Clients = () => {
     }
   };
 
+  // const editClient = async (id: number) => {
+  //   if (validateForm()) {
+  //     try {
+  //       setLoading(true);
+  //       const formDataToSend = new FormData();
+
+  //       Object.entries(formData).forEach(([key, value]) => {
+  //         const valueToSend = value !== null && value !== undefined ? value.toString() : '';
+  //         formDataToSend.append(key, valueToSend);
+  //         console.log(`Ajout du champ ${key}:`, valueToSend);
+  //       });
+
+  //       // Gestion des fichiers
+  //       if (selectedFiles.length > 0) {
+  //         console.log(`Ajout de ${selectedFiles.length} fichiers pour la mise à jour`);
+  //         selectedFiles.forEach((file, index) => {
+  //           formDataToSend.append('documents', file);
+  //           console.log(`Fichier ${index + 1} ajouté:`, file.name, file.type, file.size);
+  //         });
+
+  //         // Vérifier que les fichiers sont bien dans FormData
+  //         console.log('Nombre de champs "documents" dans FormData:',formDataToSend,
+  //           // [...formDataToSend.entries()].filter(([key]) => key === 'documents').length
+  //           );
+  //       }
+
+  //       const response = await apiClient.put(`/api/clients/${id}`, formDataToSend);
+
+  //       setFormData({
+  //         nom: '',
+  //         prenom: '',
+  //         email: '',
+  //         telephone: '',
+  //         type_visa: '',
+  //         etat_dossier: '',
+  //         email_creer: '',
+  //         mot_de_passe: '',
+  //         universite_destination: '',
+  //         pays_destination: '',
+  //         programme_etude: '',
+  //         niveau_etude: '',
+  //         statut: '',
+  //         notes: '',
+  //         payement: ''
+  //       });
+  //       setSelectedFiles([]);
+  //       setIdToUpdate(null);
+  //       getClients();
+  //       setLoading(false)
+
+  //       console.log('Client mis à jour avec succès:', response.data);
+  //     } catch (error: any) {
+  //       console.error('Erreur lors de la mise à jour du client:', error);
+
+  //       // Afficher des informations détaillées sur l'erreur pour le débogage
+  //       if (error.response) {
+  //         console.error('Réponse d\'erreur:', {
+  //           status: error.response.status,
+  //           headers: error.response.headers,
+  //           data: error.response.data
+  //         });
+  //         const errorMessage = error.response.data?.message || error.response.data?.error || 'Erreur lors de la mise à jour du client.';
+  //         seterrorsApi(`Erreur (${error.response.status}): ${errorMessage}`);
+  //       } else if (error.request) {
+  //         console.error('Requête envoyée mais pas de réponse:', error.request);
+  //         seterrorsApi('Le serveur n\'a pas répondu. Vérifiez votre connexion internet ou contactez l\'administrateur.');
+  //       } else {
+  //         console.error('Erreur de configuration de la requête:', error.message);
+  //         seterrorsApi(`Erreur: ${error.message}`);
+  //       }
+
+  //     }
+  //   }
+  // };
+  const [updatedText, setupdatedText] = useState('')
+  const [loading1, setloading1] = useState(false)
   const editClient = async (id: number) => {
-    if (validateForm()) {
-      try {
-        setLoading(true);
-        const formDataToSend = new FormData();
+    if (!validateForm()) {
+      return;
+    }
 
-        // Ajouter tous les champs du formulaire, même vides
-        Object.entries(formData).forEach(([key, value]) => {
-          // Convertir les valeurs null ou undefined en chaînes vides
-          const valueToSend = value !== null && value !== undefined ? value.toString() : '';
-          formDataToSend.append(key, valueToSend);
-          console.log(`Ajout du champ ${key}:`, valueToSend);
-        });
+    try {
+      setloading1(true);
+      const formDataToSend = new FormData();
 
-        // Gestion des fichiers
-        if (selectedFiles.length > 0) {
-          console.log(`Ajout de ${selectedFiles.length} fichiers pour la mise à jour`);
-          selectedFiles.forEach((file, index) => {
-            formDataToSend.append('documents', file);
-            console.log(`Fichier ${index + 1} ajouté:`, file.name, file.type, file.size);
+
+      Object.entries(formData).forEach(([key, value]) => {
+        const valueToSend = value?.toString() || "";
+        formDataToSend.append(key, valueToSend);
+        console.log(`Champ [${key}] ajouté:`, valueToSend);
+      });
+      console.groupEnd();
+
+      if (selectedFiles.length > 0) {
+        console.group(`Ajout de ${selectedFiles.length} fichiers`);
+        selectedFiles.forEach((file, index) => {
+          if (!(file instanceof File)) {
+            console.error("Fichier invalide à l'index", index, file);
+            throw new Error(`Le fichier ${index} n'est pas valide`);
+          }
+
+          formDataToSend.append("documents", file, file.name);
+          console.log(`Fichier ${index + 1}:`, {
+            Nom: file.name,
+            Type: file.type,
+            Taille: `${(file.size / 1024).toFixed(2)} Ko`,
+            Modifié: new Date(file.lastModified).toLocaleString()
           });
-
-          // Vérifier que les fichiers sont bien dans FormData
-          console.log('Nombre de champs "documents" dans FormData:',
-            [...formDataToSend.entries()].filter(([key]) => key === 'documents').length);
-        }
-
-        // Pour FormData, nous devons définir le header Content-Type à undefined
-        const response = await apiClient.put(`/api/clients/${id}`, formDataToSend);
-
-        setFormData({
-          nom: '',
-          prenom: '',
-          email: '',
-          telephone: '',
-          type_visa: '',
-          etat_dossier: '',
-          email_creer: '',
-          mot_de_passe: '',
-          universite_destination: '',
-          pays_destination: '',
-          programme_etude: '',
-          niveau_etude: '',
-          statut: '',
-          notes: '',
-          payement: ''
         });
-        setSelectedFiles([]);
-        setIdToUpdate(null);
-        getClients();
-        setLoading(false)
-
-        console.log('Client mis à jour avec succès:', response.data);
-      } catch (error: any) {
-        console.error('Erreur lors de la mise à jour du client:', error);
-
-        // Afficher des informations détaillées sur l'erreur pour le débogage
-        if (error.response) {
-          console.error('Réponse d\'erreur:', {
-            status: error.response.status,
-            headers: error.response.headers,
-            data: error.response.data
-          });
-          const errorMessage = error.response.data?.message || error.response.data?.error || 'Erreur lors de la mise à jour du client.';
-          seterrorsApi(`Erreur (${error.response.status}): ${errorMessage}`);
-        } else if (error.request) {
-          console.error('Requête envoyée mais pas de réponse:', error.request);
-          seterrorsApi('Le serveur n\'a pas répondu. Vérifiez votre connexion internet ou contactez l\'administrateur.');
-        } else {
-          console.error('Erreur de configuration de la requête:', error.message);
-          seterrorsApi(`Erreur: ${error.message}`);
-        }
-
+        console.groupEnd();
       }
+
+      Array.from(formDataToSend.entries()).forEach(([key, value]) => {
+        if (value instanceof File) {
+          console.log(`Fichier [${key}]:`, (value as File).name);
+        } else {
+          console.log(`Champ [${key}]:`, value);
+        }
+      });
+      console.groupEnd();
+
+    
+      const response = await apiClient.put(`/api/clients/${id}`, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const initialFormState = {
+        nom: "",
+        prenom: "",
+        email: "",
+        telephone: "",
+        type_visa: "",
+        etat_dossier: "",
+        email_creer: "",
+        mot_de_passe: "",
+        universite_destination: "",
+        pays_destination: "",
+        programme_etude: "",
+        niveau_etude: "",
+        statut: "",
+        notes: "",
+        payement: ""
+      };
+
+      setFormData(initialFormState);
+      setSelectedFiles([]);
+      setIdToUpdate(null);
+      await getClients(); 
+
+      setupdatedText(" Mise à jour réussie ")
+      setsuccess(true)
+      return response.data;
+
+    } catch (error: any) {
+      console.error("Échec de la mise à jour:", error);
+
+      // Gestion d'erreur détaillée
+      let errorMessage = "Erreur lors de la mise à jour";
+      if (error.response) {
+        console.error("Détails de l'erreur:", {
+          Status: error.response.status,
+          Data: error.response.data
+        });
+        errorMessage = error.response.data?.message ||
+          error.response.data?.error ||
+          `Erreur serveur (${error.response.status})`;
+      } else if (error.request) {
+        console.error("Pas de réponse du serveur");
+        errorMessage = "Pas de réponse du serveur - Vérifiez votre connexion";
+      } else {
+        console.error("Erreur de configuration:", error.message);
+        errorMessage = `Erreur: ${error.message}`;
+      }
+      seterrorsApi(errorMessage);
+      throw error;
+
+    } finally {
+      setloading1(false);
     }
   };
 
@@ -458,7 +533,7 @@ const Clients = () => {
     try {
       setLoading(true);
 
-   
+
 
       const response = await apiClient.delete(`/api/clients/${id}`);
 
@@ -502,7 +577,6 @@ const Clients = () => {
         errorMessage += `: ${error.message}`;
       }
 
-      // Fermer la modal de confirmation même en cas d'erreur
       setShowModalVerify(false);
       seterrorsApi(errorMessage);
     } finally {
@@ -541,6 +615,8 @@ const Clients = () => {
       const fileTarget = target as HTMLInputElement;
       const fileList = fileTarget.files ? Array.from(fileTarget.files) : [];
       setSelectedFiles(fileList);
+      console.log("📁 Fichiers sélectionnés :", fileList); // 🔍 Teste ici
+
     } else if (type === "checkbox") {
       const checkboxTarget = target as HTMLInputElement;
       setFormData((prev) => ({
@@ -559,7 +635,6 @@ const Clients = () => {
     setSearchTerm(e.target.value);
   };
 
-  // Vérifier l'authentification au chargement
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -570,7 +645,6 @@ const Clients = () => {
     }
   }, []);
 
-  // Fonction pour charger les clients avec gestion des erreurs
   const loadClients = async () => {
     setLoading(true);
     try {
@@ -583,13 +657,10 @@ const Clients = () => {
     }
   };
 
-  // Charger les clients au montage du composant
   useEffect(() => {
-    console.log('Composant monté, chargement des clients...');
     loadClients();
   }, []);
 
-  // Afficher un badge de statut de paiement selon l'état
   const renderPaymentStatus = (status: string) => {
     switch (status) {
       case 'payer':
@@ -604,43 +675,41 @@ const Clients = () => {
   };
 
 
-
-  // Fonction pour afficher les détails du client
   const showClientDetails = (client: ClientType) => {
-    console.log('Affichage des détails du client:', client.nom, client.prenom);
+    console.log('Affichage des détails du client:', client);
     setSelectedClient(client);
     setShowDetailModal(true);
   };
 
   // Fonction utilitaire pour formater l'URL des documents
-  const getDocumentUrl = (url: string | undefined) => {
-    if (!url) return '#';
+  // const getDocumentUrl = (url: string | undefined) => {
+  //   if (!url) return '#';
 
-    // Si l'URL est déjà complète (commence par http:// ou https://)
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
+  //   // Si l'URL est déjà complète (commence par http:// ou https://)
+  //   if (url.startsWith('http://') || url.startsWith('https://')) {
+  //     return url;
+  //   }
 
-    // Utiliser la nouvelle route API dédiée aux documents
-    const baseUrl = apiClient.defaults.baseURL || 'http://192.168.0.47:3000';
+  //   // Utiliser la nouvelle route API dédiée aux documents
+  //   const baseUrl = apiClient.defaults.baseURL || 'http://192.168.0.47:3000';
 
-    // Extraire juste le nom du fichier, en supprimant les chemins
-    const filename = url.split('/').pop() || url;
+  //   // Extraire juste le nom du fichier, en supprimant les chemins
+  //   const filename = url.split('/').pop() || url;
 
-    // Récupérer l'ID du client à partir du contexte actuel
-    const clientId = selectedClient?.id;
+  //   // Récupérer l'ID du client à partir du contexte actuel
+  //   const clientId = selectedClient?.id;
 
-    if (!clientId) {
-      console.error('Impossible de générer l\'URL du document: ID client manquant');
-      return '#';
-    }
+  //   if (!clientId) {
+  //     console.error('Impossible de générer l\'URL du document: ID client manquant');
+  //     return '#';
+  //   }
 
-    // Construire l'URL avec la nouvelle route API
-    const formattedUrl = `${baseUrl}/api/documents/${clientId}/${filename}`;
+  //   // Construire l'URL avec la nouvelle route API
+  //   const formattedUrl = `${baseUrl}/api/documents/${clientId}/${filename}`;
 
-    console.log('URL formatée (Clients.tsx):', formattedUrl);
-    return formattedUrl;
-  };
+  //   console.log('URL formatée (Clients.tsx):', formattedUrl);
+  //   return formattedUrl;
+  // };
 
   // Helper pour extraire le bon nom et URL du document
   const getDocumentInfo = (doc: any) => {
@@ -711,7 +780,89 @@ const Clients = () => {
     setCurrentPage(1);
   }, [clients]);
 
+
   const [confirmText, setconfirmText] = useState('')
+  const [uploaded, setuploaded] = useState(false)
+  const [uploadit, setuploadit] = useState(false)
+  const UploadDocuments = async () => {
+    setuploaded(true);
+    setuploadit(true);
+  
+    try {
+      const form = new FormData();
+  
+      Object.entries(formData).forEach(([key, value]) => {
+        form.append('nom', formData.nom);
+        form.append('prenom', formData.prenom);
+        form.append('email', formData.email);
+      });
+  
+      // Ajouter les fichiers (PDF ou autre)
+      selectedFiles.forEach((file: File) => {
+        form.append("documents", file); 
+      });
+  
+      const response = await axios.post(
+        "http://localhost:3000/api/clients/22/upload-multiple-documents",
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      console.log("Upload réussi :", response.data);
+      setuploaded(false);
+    } catch (error: any) {
+      console.error("Erreur lors de l'upload :", error.response?.data || error.message);
+    }
+  };
+
+
+  const UpdateDocuments = async (id : number) => {
+    setuploaded(true);
+    setuploadit(true);
+  
+    try {
+      const form = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        form.append('nom', formData.nom);
+        form.append('prenom', formData.prenom);
+      });
+  
+      selectedFiles.forEach((file: File) => {
+        form.append("documents", file); 
+      });
+      const token = localStorage.getItem('authToken');
+
+      const response = await axios.post(
+        `http://localhost:3000/api/clients/${id}/upload-multiple-documents`,
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}` 
+          },
+        }
+      );
+  
+      console.log("Upload réussi :", response.data);
+      setuploaded(false);
+    } catch (error: any) {
+      console.error("Erreur lors de l'upload :", error.response?.data || error.message);
+    }
+  };
+
+  const [user, setuser] = useState('');
+  useEffect(() => {
+    const storedName = localStorage.getItem('user');
+    if (storedName) {
+      const parsed = JSON.parse(storedName);
+      setuser(parsed.username);
+    }
+  }, []);
+
 
   return (
     <div className="container py-4">
@@ -740,8 +891,11 @@ const Clients = () => {
         <>
           <div className="mb-4">
             <div className="d-flex justify-content-between flex-wrap">
-              <h2 className="fw-bold mb-1">Gestion des Clients</h2>
-              <button className="btn fw-semibold"
+              <span>
+                <h2 className="fw-bold">Gestion des Clients</h2>
+                <p className="text-secondary mx-2">utilisateur : {user}</p>
+              </span>
+              <button className="btn fw-semibold h-50 mt-2"
                 data-bs-toggle="modal"
                 data-bs-target="#dossierModal"
                 style={{ backgroundColor: "#00AEEF", color: "white" }}>
@@ -763,7 +917,7 @@ const Clients = () => {
           </div>
 
           {/* <div className="table-responsive"> */}
-          <div className="position-absolute table-responsive mt-5 h-100">
+          <div className="position-absolute table-responsive1 mt-5 ">
             {Array.isArray(clients) ? (
               // <table className="table table-hover align-middle mb-0">
               <table className="table table-hover align-middle mb-0">
@@ -778,294 +932,9 @@ const Clients = () => {
                     <th>Documents</th>
                     <th>Paiement</th>
                     <th>Action</th>
+                    <th>utilisateur</th>
                   </tr>
                 </thead>
-                {/* <tbody>
-            {Array.isArray(clients) && clients.length > 0 ? (
-              clients.map((client, index) => (
-                <tr key={client.id || index}>
-                  <td>{index + 1}</td>
-                  <td>{`${client.nom || ''} ${client.prenom || ''}`}</td>
-                  <td>{client.email || ''}</td>
-                  <td>{client.telephone || ''}</td>
-                  <td>{client.type_visa || ''}</td>
-                  <td>
-                    {client.statut ? (
-                      <span className={`badge ${
-                        client.statut === 'nouveau' || client.statut === 'inscrit' ? 'bg-info' :
-                        client.statut === 'en_cours' ? 'bg-primary' :
-                        client.statut === 'incomplet' ? 'bg-warning' :
-                        client.statut === 'admission_recu' ? 'bg-success' :
-                        client.statut === 'refus' ? 'bg-danger' :
-                        client.statut === 'accepter' ? 'bg-success' :
-                        client.statut === 'partie_visa' ? 'bg-secondary' :
-                        client.statut === 'terminer' ? 'bg-dark' : 'bg-secondary'
-                      }`}>
-                        {client.statut === 'nouveau' ? 'Nouveau' :
-                         client.statut === 'inscrit' ? 'Inscrit' :
-                         client.statut === 'en_cours' ? 'En cours' :
-                         client.statut === 'incomplet' ? 'Incomplet' :
-                         client.statut === 'admission_recu' ? 'Admission reçue' :
-                         client.statut === 'refus' ? 'Refusé' :
-                         client.statut === 'accepter' ? 'Accepté' :
-                         client.statut === 'partie_visa' ? 'Partie visa' :
-                         client.statut === 'terminer' ? 'Terminé' : client.statut}
-                      </span>
-                    ) : ''}
-                  </td>
-                  <td>
-                    {Array.isArray(client.documents) ? (
-                      <div className="dropdown">
-                        <button className="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                          {client.documents.length} fichier(s)
-                        </button>
-                        <ul className="dropdown-menu">
-                          {client.documents.length > 0 ? (
-                            client.documents.map((doc, idx) => {
-                              const { name, url } = getDocumentInfo(doc);
-                              return (
-                                <li key={idx}>
-                                  <a className="dropdown-item" download={name} 
-                                  href={`../../../backend/uploads/${name}`}
-                                   target="_blank" rel="noopener noreferrer">
-                                    {name}
-                                  </a>
-                                </li>
-                              );
-                            })
-                          ) : (
-                            <li><span className="dropdown-item text-muted">Aucun document</span></li>
-                          )}
-                          <li><hr className="dropdown-divider" /></li>
-                          <li>
-                            <button 
-                              className="dropdown-item text-primary" 
-                              data-bs-toggle="modal" 
-                              data-bs-target="#EditedossierModal"
-                              onClick={() => {
-                                if (client.id) {
-                                  setIdToUpdate(client.id);
-                                  getClientById(client.id);
-                                }
-                              }}
-                            >
-                              Ajouter un document
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    ) : (
-                      <button 
-                        className="btn btn-sm btn-outline-primary"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#EditedossierModal"
-                        onClick={() => {
-                          if (client.id) {
-                            setIdToUpdate(client.id);
-                            getClientById(client.id);
-                          }
-                        }}
-                      >
-                        Ajouter
-                      </button>
-                    )}
-                  </td>
-                  <td>{client.payement ? renderPaymentStatus(client.payement) : ''}</td>
-                  <td>
-                    <div className="d-flex gap-2">
-                          <button 
-                        className="btn btn-sm btn-info"  
-                        onClick={() => {
-                          if (client) {
-                            showClientDetails(client);
-                          }
-                        }}
-                        title="Voir les détails du client">
-                        <FaEye size={18} />
-                      </button>
-                      <button 
-                        className="btn btn-sm btn-success"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#EditedossierModal"
-                        onClick={() => {
-                          if (client.id) {
-                            getClientById(client.id);
-                          }
-                        }}
-                        title="Modifier ce client">
-                        <CiEdit size={18} />
-                      </button>
-                      <button 
-                        className="btn btn-sm btn-danger"  
-                        onClick={() => {
-                          if (client.id) {
-                            console.log('Demande de suppression du client avec ID:', client.id);
-                            setIdToDelete(client.id);
-                            setShowModalVerify(true);
-                          }
-                        }}
-                        title="Supprimer ce client">
-                        <CiTrash size={18} />
-                      </button>
-                  
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={9} className="text-center py-3">
-                  Aucun client trouvé
-                </td>
-              </tr>
-            )}          </tbody> */}
-
-                {/* <tbody>
-  {Array.isArray(clients) && clients.length > 0 ? (
-    currentClients.length > 0 ? (
-      <tr key={currentClients[0].id || 0}>
-        <td>{currentPage}</td> 
-        <td>{`${currentClients[0].nom || ''} ${currentClients[0].prenom || ''}`}</td>
-        <td>{currentClients[0].email || ''}</td>
-        <td>{currentClients[0].telephone || ''}</td>
-        <td>{currentClients[0].type_visa || ''}</td>
-        <td>
-          {currentClients[0].statut ? (
-            <span className={`badge ${
-              currentClients[0].statut === 'nouveau' || currentClients[0].statut === 'inscrit' ? 'bg-info' :
-              currentClients[0].statut === 'en_cours' ? 'bg-primary' :
-              currentClients[0].statut === 'incomplet' ? 'bg-warning' :
-              currentClients[0].statut === 'admission_recu' ? 'bg-success' :
-              currentClients[0].statut === 'refus' ? 'bg-danger' :
-              currentClients[0].statut === 'accepter' ? 'bg-success' :
-              currentClients[0].statut === 'partie_visa' ? 'bg-secondary' :
-              currentClients[0].statut === 'terminer' ? 'bg-dark' : 'bg-secondary'
-            }`}>
-              {currentClients[0].statut === 'nouveau' ? 'Nouveau' :
-               currentClients[0].statut === 'inscrit' ? 'Inscrit' :
-               currentClients[0].statut === 'en_cours' ? 'En cours' :
-               currentClients[0].statut === 'incomplet' ? 'Incomplet' :
-               currentClients[0].statut === 'admission_recu' ? 'Admission reçue' :
-               currentClients[0].statut === 'refus' ? 'Refusé' :
-               currentClients[0].statut === 'accepter' ? 'Accepté' :
-               currentClients[0].statut === 'partie_visa' ? 'Partie visa' :
-               currentClients[0].statut === 'terminer' ? 'Terminé' : currentClients[0].statut}
-            </span>
-          ) : ''}
-        </td>
-        <td>
-          {Array.isArray(currentClients[0].documents) ? (
-            <div className="dropdown">
-              <button className="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                {currentClients[0].documents.length} fichier(s)
-              </button>
-              <ul className="dropdown-menu">
-                {currentClients[0].documents.length > 0 ? (
-                  currentClients[0].documents.map((doc, idx) => {
-                    const { name, url } = getDocumentInfo(doc);
-                    return (
-                      <li key={idx}>
-                        <a className="dropdown-item" download={name} 
-                        href={`../../../backend/uploads/${name}`}
-                         target="_blank" rel="noopener noreferrer">
-                          {name}
-                        </a>
-                      </li>
-                    );
-                  })
-                ) : (
-                  <li><span className="dropdown-item text-muted">Aucun document</span></li>
-                )}
-                <li><hr className="dropdown-divider" /></li>
-                <li>
-                  <button 
-                    className="dropdown-item text-primary" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#EditedossierModal"
-                    onClick={() => {
-                      if (currentClients[0].id) {
-                        setIdToUpdate(currentClients[0].id);
-                        getClientById(currentClients[0].id);
-                      }
-                    }}
-                  >
-                    Ajouter un document
-                  </button>
-                </li>
-              </ul>
-            </div>
-          ) : (
-            <button 
-              className="btn btn-sm btn-outline-primary"
-              data-bs-toggle="modal" 
-              data-bs-target="#EditedossierModal"
-              onClick={() => {
-                if (currentClients[0].id) {
-                  setIdToUpdate(currentClients[0].id);
-                  getClientById(currentClients[0].id);
-                }
-              }}
-            >
-              Ajouter
-            </button>
-          )}
-        </td>
-        <td>{currentClients[0].payement ? renderPaymentStatus(currentClients[0].payement) : ''}</td>
-        <td>
-          <div className="d-flex gap-2">
-            <button 
-              className="btn btn-sm btn-info"  
-              onClick={() => {
-                if (currentClients[0]) {
-                  showClientDetails(currentClients[0]);
-                }
-              }}
-              title="Voir les détails du client">
-              <FaEye size={18} />
-            </button>
-            <button 
-              className="btn btn-sm btn-success"
-              data-bs-toggle="modal" 
-              data-bs-target="#EditedossierModal"
-              onClick={() => {
-                if (currentClients[0].id) {
-                  getClientById(currentClients[0].id);
-                }
-              }}
-              title="Modifier ce client">
-              <CiEdit size={18} />
-            </button>
-            <button 
-              className="btn btn-sm btn-danger"  
-              onClick={() => {
-                if (currentClients[0].id) {
-                  console.log('Demande de suppression du client avec ID:', currentClients[0].id);
-                  setIdToDelete(currentClients[0].id);
-                  setShowModalVerify(true);
-                }
-              }}
-              title="Supprimer ce client">
-              <CiTrash size={18} />
-            </button>
-          </div>
-        </td>
-      </tr>
-    ) : (
-      <tr>
-        <td colSpan={9} className="text-center py-3">
-          Aucun client à afficher sur cette page
-        </td>
-      </tr>
-    )
-  ) : (
-    <tr>
-      <td colSpan={9} className="text-center py-3">
-        Aucun client trouvé
-      </td>
-    </tr>
-  )}
-</tbody> */}
-
                 <tbody>
                   {Array.isArray(clients) && clients.length > 0 ? (
                     currentClients.length > 0 ? (
@@ -1112,7 +981,7 @@ const Clients = () => {
                                       return (
                                         <li key={idx}>
                                           <a className="dropdown-item" download={name}
-                                            href={`../../../backend/uploads/${name}`}
+                                            href={`https://backend1-lz19.onrender.com/uploads/${name}`}
                                             target="_blank" rel="noopener noreferrer">
                                             {name}
                                           </a>
@@ -1273,17 +1142,29 @@ const Clients = () => {
 
 
       {/* Modal d'ajout de client */}
-      <div className="modal fade" id="dossierModal" tabIndex={-1} aria-hidden="true">
+     {
+      !success && (
+        <div className="modal fade" id="dossierModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-lg">
           <form className="modal-content" onSubmit={handleDossierSubmit}>
             <div className="modal-header">
               <h5 className="modal-title">Ajouter un client</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setaddedText('')}></button>
             </div>
             <div className="modal-body row g-3">
+              <div className='col-12'>
+                {
+                  addedText !== "" &&
+                  <div className="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                    <i className="bi bi-check-circle-fill me-2"></i>
+                    {addedText}
+                    <button type="button" className="btn-close" onClick={() => setaddedText('')}></button>
+                  </div>
+                }
+              </div>
               {/* Informations personnelles */}
               <div className="col-md-6">
-                <label className="form-label">Nom</label>
+                <label className="form-label fw-bold">Nom</label>
                 <input
                   name="nom"
                   type="text"
@@ -1296,7 +1177,7 @@ const Clients = () => {
                 {errors.nom && <div className="invalid-feedback">{errors.nom}</div>}
               </div>
               <div className="col-md-6">
-                <label className="form-label">Prénom</label>
+                <label className="form-label fw-bold">Prénom</label>
                 <input
                   name="prenom"
                   type="text"
@@ -1309,7 +1190,7 @@ const Clients = () => {
                 {errors.prenom && <div className="invalid-feedback">{errors.prenom}</div>}
               </div>
               <div className="col-md-6">
-                <label className="form-label">Email</label>
+                <label className="form-label fw-bold">Email</label>
                 <input
                   name="email"
                   type="email"
@@ -1322,7 +1203,7 @@ const Clients = () => {
                 {errors.email && <div className="invalid-feedback">{errors.email}</div>}
               </div>
               <div className="col-md-6">
-                <label className="form-label">Téléphone</label>
+                <label className="form-label fw-bold">Téléphone</label>
                 <input
                   name="telephone"
                   type="tel"
@@ -1337,7 +1218,7 @@ const Clients = () => {
 
               {/* Informations de connexion */}
               <div className="col-md-6">
-                <label className="form-label">Email de connexion</label>
+                <label className="form-label fw-bold">Email de connexion</label>
                 <input
                   name="email_creer"
                   type="email"
@@ -1348,7 +1229,7 @@ const Clients = () => {
                 />
               </div>
               <div className="col-md-6">
-                <label className="form-label">Mot de passe</label>
+                <label className="form-label fw-bold">Mot de passe</label>
                 <input
                   name="mot_de_passe"
                   type="text"
@@ -1361,7 +1242,7 @@ const Clients = () => {
 
               {/* Informations de voyage/études */}
               <div className="col-md-6">
-                <label className="form-label">Type de visa</label>
+                <label className="form-label fw-bold">Type de visa</label>
                 <select
                   name="type_visa"
                   className={`form-select ${errors.type_visa ? 'is-invalid' : ''}`}
@@ -1378,7 +1259,7 @@ const Clients = () => {
               </div>
 
               <div className="col-md-6">
-                <label className="form-label">Statut de paiement</label>
+                <label className="form-label fw-bold">Statut de paiement</label>
                 <select
                   name="payement"
                   className={`form-select ${errors.payement ? 'is-invalid' : ''}`}
@@ -1398,7 +1279,7 @@ const Clients = () => {
               {formData.type_visa === 'études' && (
                 <>
                   <div className="col-md-6">
-                    <label className="form-label">Programme d'étude</label>
+                    <label className="form-label fw-bold">Programme d'étude</label>
                     <input
                       name="programme_etude"
                       type="text"
@@ -1409,7 +1290,7 @@ const Clients = () => {
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Université de destination</label>
+                    <label className="form-label fw-bold">Université de destination</label>
                     <input
                       name="universite_destination"
                       type="text"
@@ -1420,7 +1301,7 @@ const Clients = () => {
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Pays de destination</label>
+                    <label className="form-label fw-bold">Pays de destination</label>
                     <input
                       name="pays_destination"
                       type="text"
@@ -1431,7 +1312,7 @@ const Clients = () => {
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Niveau d'études</label>
+                    <label className="form-label fw-bold">Niveau d'études</label>
                     <input
                       name="niveau_etude"
                       type="text"
@@ -1442,7 +1323,7 @@ const Clients = () => {
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Statut</label>
+                    <label className="form-label fw-bold">Statut</label>
                     <select
                       name="statut"
                       className="form-select"
@@ -1465,8 +1346,8 @@ const Clients = () => {
               )}
 
               {/* Documents */}
-              <div className="col-md-12">
-                <label className="form-label">Documents</label>
+              <div className="col-md-12 ">
+                <label className="form-label fw-bold">Documents</label>
                 {selectedFiles.length > 0 && (
                   <ul className="list-unstyled mb-2">
                     {selectedFiles.map((file, index) => (
@@ -1474,18 +1355,24 @@ const Clients = () => {
                     ))}
                   </ul>
                 )}
-                <input
-                  name="documents"
-                  type="file"
-                  multiple
-                  className="form-control"
-                  onChange={handleInputChange}
-                />
+                <span className='d-flex justify-content-between gap-3' >
+                  <input
+                    name="documents"
+                    type="file"
+                    multiple
+                    className="form-control"
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <button className='btn btn-outline-success' type="button" onClick={() => UploadDocuments()}>
+                    {uploaded ? " ... " : " Stocker"}
+                  </button>
+                </span>
               </div>
 
               {/* Notes */}
               <div className="col-md-12">
-                <label className="form-label">Notes</label>
+                <label className="form-label fw-bold">Notes</label>
                 <textarea
                   name="notes"
                   className="form-control"
@@ -1504,153 +1391,179 @@ const Clients = () => {
               )}
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-              <button type="submit" className="btn btn-primary">Enregistrer</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => setaddedText('')}>Fermer</button>
+              <button type="submit" className={`btn btn-primary `} {...(success ? { "data-bs-dismiss": "modal" } : {})}
+              >Enregistrer</button>
             </div>
           </form>
         </div>
       </div>
+      )
+     }
 
       {/* Modal de modification de client */}
-      <div className="modal fade" id="EditedossierModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-lg">
-          <form className="modal-content" onSubmit={(e) => {
-            e.preventDefault();
-            if (IdToUpdate) editClient(IdToUpdate);
-          }}>
-            <div className="modal-header">
-              <h5 className="modal-title">Modifier le client</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div className="modal-body row g-3">
-              {/* Mêmes champs que pour l'ajout */}
-              <div className="col-md-6">
-                <label className="form-label">Nom</label>
-                <input
-                  name="nom"
-                  type="text"
-                  className={`form-control ${errors.nom ? 'is-invalid' : ''}`}
-                  placeholder="Saisissez le nom..."
-                  value={formData.nom}
-                  onChange={handleInputChange}
-                  required
-                />
-                {errors.nom && <div className="invalid-feedback">{errors.nom}</div>}
+      {
+        !success && (
+          <div className="modal fade" id="EditedossierModal" data-bs-backdrop="static"
+          data-bs-keyboard="false" tabIndex={-1} aria-hidden="true" >
+          <div className="modal-dialog modal-lg">
+            <form className="modal-content" onSubmit={(e) => {
+              e.preventDefault();
+              if (IdToUpdate) editClient(IdToUpdate);
+            }}>
+              <div className="modal-header">
+                <h5 className="modal-title">Modifier le client</h5>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setupdatedText('')}></button>
               </div>
-              <div className="col-md-6">
-                <label className="form-label">Prénom</label>
-                <input
-                  name="prenom"
-                  type="text"
-                  className={`form-control ${errors.prenom ? 'is-invalid' : ''}`}
-                  placeholder="Saisissez le prénom..."
-                  value={formData.prenom}
-                  onChange={handleInputChange}
-                  required
-                />
-                {errors.prenom && <div className="invalid-feedback">{errors.prenom}</div>}
-              </div>
-              <div className="col-md-6">
-                <label className="form-label">Email</label>
-                <input
-                  name="email"
-                  type="email"
-                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                  placeholder="Saisissez l'email..."
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-                {errors.email && <div className="invalid-feedback">{errors.email}</div>}
-              </div>
-              <div className="col-md-6">
-                <label className="form-label">Téléphone</label>
-                <input
-                  name="telephone"
-                  type="tel"
-                  className={`form-control ${errors.telephone ? 'is-invalid' : ''}`}
-                  placeholder="Saisissez le téléphone..."
-                  value={formData.telephone}
-                  onChange={handleInputChange}
-                  required
-                />
-                {errors.telephone && <div className="invalid-feedback">{errors.telephone}</div>}
-              </div>
-
-              {/* Autres champs comme dans le formulaire d'ajout */}
-              <div className="col-md-6">
-                <label className="form-label">Type de visa</label>
-                <select
-                  name="type_visa"
-                  className={`form-select ${errors.type_visa ? 'is-invalid' : ''}`}
-                  value={formData.type_visa}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">-- Sélectionnez un type de visa --</option>
-                  <option value="tourisme">Visa Tourisme</option>
-                  <option value="Sans visa">Sans Visa</option>
-                  <option value="études">Visa Études</option>
-                </select>
-                {errors.type_visa && <div className="invalid-feedback">{errors.type_visa}</div>}
-              </div>
-              <div className="col-md-6">
-                <label className="form-label">Statut de paiement</label>
-                <select
-                  name="payement"
-                  className={`form-select ${errors.payement ? 'is-invalid' : ''}`}
-                  value={formData.payement}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">-- Sélectionnez un statut --</option>
-                  <option value="payer">Payé</option>
-                  <option value="pas_payer">Non payé</option>
-                  <option value="partielle">Paiement partiel</option>
-                </select>
-                {errors.payement && <div className="invalid-feedback">{errors.payement}</div>}
-              </div>
-
-              {/* Documents */}
-              <div className="col-md-12">
-                <label className="form-label">Documents (nouveaux documents)</label>
-                {selectedFiles.length > 0 && (
-                  <ul className="list-unstyled mb-2">
-                    {selectedFiles.map((file, index) => (
-                      <li key={index} className="text-muted small">📄 {file.name}</li>
-                    ))}
-                  </ul>
-                )}
-                <input
-                  name="documents"
-                  type="file"
-                  multiple
-                  className="form-control"
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              {/* Message d'erreur API dans le formulaire d'édition */}
-              {errorsApi && (
-                <div className="col-12 mt-3">
-                  <div className="alert alert-danger">{errorsApi}</div>
+              <div className="modal-body row g-3">
+                <div className='col-md-12'>
+                  {
+                    updatedText !== "" &&
+                    <div className="alert alert-success alert-dismissible fade show h-75" role="alert">
+                      <i className="bi bi-check-circle-fill "></i>
+                      {updatedText}
+                      <button type="button" className="btn-close" onClick={() => setupdatedText('')}></button>
+                    </div>
+                  }
                 </div>
-              )}
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-              <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Mise à jour en cours...
-                  </>
-                ) : "Mettre à jour"}
-              </button>
-            </div>
-          </form>
+                {/* Mêmes champs que pour l'ajout */}
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Nom</label>
+                  <input
+                    name="nom"
+                    type="text"
+                    className={`form-control ${errors.nom ? 'is-invalid' : ''}`}
+                    placeholder="Saisissez le nom..."
+                    value={formData.nom}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.nom && <div className="invalid-feedback">{errors.nom}</div>}
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Prénom</label>
+                  <input
+                    name="prenom"
+                    type="text"
+                    className={`form-control ${errors.prenom ? 'is-invalid' : ''}`}
+                    placeholder="Saisissez le prénom..."
+                    value={formData.prenom}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.prenom && <div className="invalid-feedback">{errors.prenom}</div>}
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                    placeholder="Saisissez l'email..."
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Téléphone</label>
+                  <input
+                    name="telephone"
+                    type="tel"
+                    className={`form-control ${errors.telephone ? 'is-invalid' : ''}`}
+                    placeholder="Saisissez le téléphone..."
+                    value={formData.telephone}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.telephone && <div className="invalid-feedback">{errors.telephone}</div>}
+                </div>
+  
+                {/* Autres champs comme dans le formulaire d'ajout */}
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Type de visa</label>
+                  <select
+                    name="type_visa"
+                    className={`form-select ${errors.type_visa ? 'is-invalid' : ''}`}
+                    value={formData.type_visa}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">-- Sélectionnez un type de visa --</option>
+                    <option value="tourisme">Visa Tourisme</option>
+                    <option value="Sans visa">Sans Visa</option>
+                    <option value="études">Visa Études</option>
+                  </select>
+                  {errors.type_visa && <div className="invalid-feedback">{errors.type_visa}</div>}
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Statut de paiement</label>
+                  <select
+                    name="payement"
+                    className={`form-select ${errors.payement ? 'is-invalid' : ''}`}
+                    value={formData.payement}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">-- Sélectionnez un statut --</option>
+                    <option value="payer">Payé</option>
+                    <option value="pas_payer">Non payé</option>
+                    <option value="partielle">Paiement partiel</option>
+                  </select>
+                  {errors.payement && <div className="invalid-feedback">{errors.payement}</div>}
+                </div>
+  
+                {/* Documents */}
+                <div className="col-md-12">
+                  <label className="form-label fw-bold">Documents (nouveaux documents)</label>
+                  {selectedFiles.length > 0 && (
+                    <ul className="list-unstyled mb-2">
+                      {selectedFiles.map((file, index) => (
+                        <li key={index} className="text-muted small">📄 {file.name}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <span className='d-flex justify-content-between gap-3'>
+                    <input
+                      name="documents"
+                      type="file"
+                      multiple
+                      className="form-control"
+                      onChange={handleInputChange}
+                    />
+                    <button className='btn btn-outline-success' type="button" onClick={(e) => {
+              e.preventDefault();
+              if (IdToUpdate) UpdateDocuments(IdToUpdate);
+            }} >
+                      {uploaded ? " ... " : " Stocker"}
+                    </button>
+                  </span>
+                </div>
+  
+                {/* Message d'erreur API dans le formulaire d'édition */}
+                {errorsApi && (
+                  <div className="col-12 mt-3">
+                    <div className="alert alert-danger">{errorsApi}</div>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => setupdatedText('')}>Fermer</button>
+                <button type="submit" className="btn btn-primary" disabled={loading1}>
+                  {loading1 ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" ></span>
+                      Mise à jour en cours...
+                    </>
+                  ) : "Mettre à jour"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
+        )
+      }
 
       {/* Modal de confirmation pour la suppression */}
       {ShowModalVerify && (

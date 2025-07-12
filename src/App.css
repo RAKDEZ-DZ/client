@@ -98,7 +98,7 @@
 
 .table-responsive1 {
   overflow-x: auto;
-  max-width: 80%;
+  max-width: 84%;
   white-space: nowrap;
 }
 
@@ -150,6 +150,11 @@ display: none;
     max-width: 70%;
     white-space: nowrap;
   }
+  .table-responsive1 {
+    overflow-x: auto;
+    max-width: 60%;
+    white-space: nowrap;
+  }
 }
 
 
@@ -167,6 +172,11 @@ display: none;
     width: 70px;
     height: 70px;
   }
+  .table-responsive1 {
+    overflow-x: auto;
+    max-width: 80%;
+    white-space: nowrap;
+  }
 
 }
 
@@ -174,6 +184,11 @@ display: none;
 @media (max-width: 550px) {
 
   .table-responsive {
+    overflow-x: auto;
+    max-width: 80%;
+    white-space: nowrap;
+  }
+  .table-responsive1 {
     overflow-x: auto;
     max-width: 80%;
     white-space: nowrap;

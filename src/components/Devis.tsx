@@ -1166,7 +1166,7 @@ const Devis = () => {
                                             <th style="width: 10%;">Référence</th>
                                             <th style="width: 50%;">Désignation</th>
                                             <th style="width: 20%;" class="text-end">Prix Unitaire</th>
-                                            <th style="width: 20%;" class="text-end">Total HT</th>
+                                            <th style="width: 20%;" class="text-end">Total</th>
                                           </tr>
                                         </thead>
                                         <tbody>
@@ -1185,17 +1185,8 @@ const Devis = () => {
                                         </tbody>
                                         <tfoot>
                                           <tr>
-                                            <th colspan="3" class="text-end">Total HT</th>
+                                            <th colspan="3" class="text-end">Total</th>
                                             <th class="text-end">${selectedItem.montant}</th>
-                                          </tr>
-                                          <tr>
-                                            <th colspan="3" class="text-end">TVA (20%)</th>
-                                            <th class="text-end">${(parseFloat(selectedItem.montant) * 0.2).toFixed(2)} DA</th>
-                                          </tr>
-                                          <tr>
-                                            <th colspan="3" class="text-end">Total TTC</th>
-                                            <th class="text-end">${(parseFloat(selectedItem.montant) * 1.2).toFixed(2)} DA</th>
-                                          </tr>
                                           ${selectedItem.montantRestant && parseFloat(selectedItem.montantRestant) > 0 ? `
                                             <tr>
                                               <th colspan="3" class="text-end">Déjà payé</th>
@@ -1209,17 +1200,7 @@ const Devis = () => {
                                         </tfoot>
                                       </table>
                                     </div>
-                                    
-                                    <!-- Conditions de paiement -->
-                                    <div class="mb-5">
-                                      <h5 class="border-bottom pb-2 mb-3" style="color: #00AEEF;">Conditions de paiement</h5>
-                                      <div class="p-3 border rounded bg-light">
-                                        <p class="mb-1"><strong>Mode de paiement:</strong> Virement bancaire, carte bancaire ou chèque</p>
-                                        <p class="mb-1"><strong>Échéance:</strong> Paiement à effectuer sous 30 jours à compter de la date d'émission</p>
-                                        <p class="mb-0"><strong>Coordonnées bancaires:</strong> IBAN: FR76 1234 5678 9101 1121 3141 516 | BIC: ABCDEFGH</p>
-                                      </div>
-                                    </div>
-                                    
+                      
                                   
                                   </div>
                                 </div>
@@ -1268,7 +1249,7 @@ const Devis = () => {
                 
                 <div className="row g-3">
                   <div className="col-12">
-                    <label className="form-label">Client</label>
+                    <label className="form-label fw-bold">Client</label>
                     <select
                       className="form-select"
                       value={nom}
@@ -1300,7 +1281,7 @@ const Devis = () => {
                   </div>
                   
                   <div className="col-md-6">
-                    <label className="form-label">Email</label>
+                    <label className="form-label fw-bold">Email</label>
                     <input
                       type="email"
                       className="form-control"
@@ -1311,7 +1292,7 @@ const Devis = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Téléphone</label>
+                    <label className="form-label fw-bold">Téléphone</label>
                     <input
                       type="tel"
                       className="form-control"
@@ -1323,7 +1304,7 @@ const Devis = () => {
                   </div>
 
                   <div className="col-12">
-                    <label className="form-label">Titre/Motif</label>
+                    <label className="form-label fw-bold">Titre/Motif</label>
                     <input
                       type="text"
                       className="form-control"
@@ -1335,7 +1316,7 @@ const Devis = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Montant HT (DA)</label>
+                    <label className="form-label fw-bold">Montant HT (DA)</label>
                     <input
                       type="number"
                       className="form-control"
@@ -1354,7 +1335,7 @@ const Devis = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Versement initial</label>
+                    <label className="form-label fw-bold">Versement initial</label>
                     <input
                       type="number"
                       className="form-control"
@@ -1373,7 +1354,7 @@ const Devis = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <label className="form-label">Reste à Payer (DA)</label>
+                    <label className="form-label fw-bold">Reste à Payer (DA)</label>
                     <input
                       type="number"
                       className="form-control"
@@ -1422,7 +1403,7 @@ const Devis = () => {
                 )}
                 
                 <div className="mb-3">
-                  <label className="form-label">Montant versé (DA)</label>
+                  <label className="form-label fw-bold">Montant versé (DA)</label>
                   <input
                     type="number"
                     className="form-control"
@@ -1449,7 +1430,7 @@ const Devis = () => {
                 </div>
                 
                 <div className="mb-3">
-                  <label className="form-label">Reste à payer (DA)</label>
+                  <label className="form-label fw-bold">Reste à payer (DA)</label>
                   <input
                     type="number"
                     className="form-control bg-light"

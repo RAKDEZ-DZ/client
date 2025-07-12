@@ -49,7 +49,7 @@ function App() {
     };
 
     verifyToken();
-  }, []);
+  }, [loading]);
 
   const components: any = {
     Dashboard: <Dashboard />,

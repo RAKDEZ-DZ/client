@@ -83,15 +83,19 @@ export default function Login({setIsAuthenticated}: any) {
         console.log('Réponse complète du serveur:', response);
         
         if (response.data && response.data.data && response.data.data.token) {
+          if (localStorage.getItem('authToken')) {
+           return alert('Vous allez être déconnecté(e) de la session précédente.');
+          }          
           localStorage.setItem('authToken', response.data.data.token);
           
           if (response.data.data.user) {
+            if (localStorage.getItem('user')) { 
+             return alert('Vous allez être déconnecté(e) de la session précédente.');
+             }
             localStorage.setItem('user', JSON.stringify(response.data.data.user));
-            console.log('Informations utilisateur sauvegardées:', response.data.data.user);
           }
           
           try {
-            console.log('Tentative de récupération des permissions...');
             const permissions = await getUserPermissions();
             console.log('Permissions récupérées après login:', permissions);
             
@@ -99,7 +103,6 @@ export default function Login({setIsAuthenticated}: any) {
               console.warn('Aucune permission récupérée ou format incorrect');
             }
             
-            console.log('Authentification réussie:', response.data);
             setIsAuthenticated(true);
           } catch (permError) {
             console.error('Erreur lors de la récupération des permissions:', permError);
