@@ -535,7 +535,6 @@ const Clients = () => {
     try {
       setLoading(true);
       const response = await apiClient.delete(`/api/clients/${id}`);
-
       setShowModalVerify(false);
       setIdToDelete(null);
       seterrorsApi('');
