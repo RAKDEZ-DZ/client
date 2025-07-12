@@ -228,8 +228,10 @@ const Clients = () => {
       });
 
       if (response.data) {
+        console.log(`Nombre de clients récupérés (json): ${response.data}`);
+        console.table(response.data); 
         if (Array.isArray(response.data)) {
-          console.log(`Nombre de clients récupérés: ${response.data}`);
+          console.log(`Nombre de clients récupérés ;;;;;;;;;;;;;;;;;;;: ${response.data}`);
           setClients(response.data);
         } else if (typeof response.data === 'object') {
           // Si c'est un objet mais pas un tableau, vérifier s'il contient une propriété qui pourrait contenir les clients
@@ -532,28 +534,19 @@ const Clients = () => {
   const deleteClient = async (id: number) => {
     try {
       setLoading(true);
-
-
-
       const response = await apiClient.delete(`/api/clients/${id}`);
 
-
-      // Fermer la modal de confirmation
       setShowModalVerify(false);
       setIdToDelete(null);
-
       seterrorsApi('');
 
-      // Rafraîchir la liste des clients
       getClients();
-
     } catch (error: any) {
       console.error('Erreur lors de la suppression du client:', error);
 
       let errorMessage = 'Erreur lors de la suppression du client';
 
       if (error.response) {
-        // La requête a été faite et le serveur a répondu avec un code d'état
         console.error('Réponse d\'erreur:', error.response.data);
         errorMessage += `: ${error.response.status} - ${error.response.data?.message || error.response.statusText}`;
 
@@ -739,7 +732,7 @@ const Clients = () => {
     }
     else if (doc.relativePath) url = `/uploads/${doc.relativePath}`;
 
-    console.log('Document info:', { name, url });
+    // console.log('Document info:', { name, url });
     return { name, url };
   };
 
@@ -981,7 +974,7 @@ const Clients = () => {
                                       return (
                                         <li key={idx}>
                                           <a className="dropdown-item" download={name}
-                                            href={`https://backend1-lz19.onrender.com/uploads/${name}`}
+                                            href={`https://zfudepqfbdwtphljzorg.supabase.co/services/documentService/${name}`}
                                             target="_blank" rel="noopener noreferrer">
                                             {name}
                                           </a>
