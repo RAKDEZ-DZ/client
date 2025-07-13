@@ -164,10 +164,9 @@ const Clients = () => {
           }
         });
 
-        const utilisateur = "admin@example.com"; 
         const utilisateur1 = user; 
         formDataToSend.append('user_username_createur', utilisateur1);
-        console.log('Ajout de utilisateur :', utilisateur);
+        console.log('Ajout de utilisateur :', utilisateur1);
 
         if (selectedFiles.length > 0) {
           console.log(`Ajout de ${selectedFiles.length} fichiers`);
