@@ -161,6 +161,11 @@ const Clients = () => {
           }
         });
 
+        const utilisateur = "admin@example.com"; 
+        const utilisateur1 = user; 
+        formDataToSend.append('utilisateur', utilisateur);
+        console.log('Ajout de utilisateur :', utilisateur);
+
         if (selectedFiles.length > 0) {
           console.log(`Ajout de ${selectedFiles.length} fichiers`);
           selectedFiles.forEach((file) => {
@@ -607,7 +612,7 @@ const Clients = () => {
       const fileTarget = target as HTMLInputElement;
       const fileList = fileTarget.files ? Array.from(fileTarget.files) : [];
       setSelectedFiles(fileList);
-      console.log("📁 Fichiers sélectionnés :", fileList); // 🔍 Teste ici
+      console.log("📁 Fichiers sélectionnés :", fileList); 
 
     } else if (type === "checkbox") {
       const checkboxTarget = target as HTMLInputElement;
@@ -795,7 +800,7 @@ const Clients = () => {
       });
   
       const response = await axios.post(
-        "http://localhost:3000/api/clients/22/upload-multiple-documents",
+        "https://backend1-lz19.onrender.com/api/clients/22/upload-multiple-documents",
         form,
         {
           headers: {
@@ -829,7 +834,7 @@ const Clients = () => {
       const token = localStorage.getItem('authToken');
 
       const response = await axios.post(
-        `http://localhost:3000/api/clients/${id}/upload-multiple-documents`,
+        `https://backend1-lz19.onrender.com/api/clients/${id}/upload-multiple-documents`,
         form,
         {
           headers: {
@@ -839,7 +844,7 @@ const Clients = () => {
         }
       );
   
-      console.log("Upload réussi :", response.data);
+      console.log("updates réussi :", response.data);
       setuploaded(false);
     } catch (error: any) {
       console.error("Erreur lors de l'upload :", error.response?.data || error.message);
@@ -847,8 +852,17 @@ const Clients = () => {
   };
 
   const [user, setuser] = useState('');
+  const [role, setrole] = useState('');
+
   useEffect(() => {
     const storedName = localStorage.getItem('user');
+    const storeRole = localStorage.getItem('userPermissions');
+    if (storeRole) {
+      const parsed = JSON.parse(storeRole);
+      setrole(parsed.role);
+      console.log("hhhhhhhhhhhhhhhhhhh" , parsed.role)
+    }
+
     if (storedName) {
       const parsed = JSON.parse(storedName);
       setuser(parsed.username);
@@ -968,14 +982,16 @@ const Clients = () => {
                                 </button>
                                 <ul className="dropdown-menu">
                                   {client.documents.length > 0 ? (
-                                    client.documents.map((doc, idx) => {
-                                      const { name, url } = getDocumentInfo(doc);
+                                    (client.documents as Array<{ id: string; name: string; url: string }>).map((doc, idx) => {
+                                      // const { name, url } = getDocumentInfo(doc);
+                                      const fileName = doc.name ;
+                                      const name = `${doc.id}-${doc.name}`;
                                       return (
                                         <li key={idx}>
                                           <a className="dropdown-item" download={name}
-                                            href={`https://zfudepqfbdwtphljzorg.supabase.co/services/documentService/${name}`}
+                                            href={doc.url}
                                             target="_blank" rel="noopener noreferrer">
-                                            {name}
+                                            {fileName}
                                           </a>
                                         </li>
                                       );
@@ -1356,9 +1372,9 @@ const Clients = () => {
                     onChange={handleInputChange}
                     required
                   />
-                  <button className='btn btn-outline-success' type="button" onClick={() => UploadDocuments()}>
+                  {/* <button className='btn btn-outline-success' type="button" onClick={() => UploadDocuments()}>
                     {uploaded ? " ... " : " Stocker"}
-                  </button>
+                  </button> */}
                 </span>
               </div>
 
@@ -1528,7 +1544,7 @@ const Clients = () => {
               e.preventDefault();
               if (IdToUpdate) UpdateDocuments(IdToUpdate);
             }} >
-                      {uploaded ? " ... " : " Stocker"}
+                      {uploaded ? " ... " : " modifier"}
                     </button>
                   </span>
                 </div>
