@@ -328,7 +328,8 @@ const Clients = () => {
         niveau_etude: clientData.niveau_etude || '',
         statut: clientData.statut || '',
         notes: clientData.notes || '',
-        payement: clientData.payement || ''
+        payement: clientData.payement || '',
+        user_username_createur:  clientData.user_username_createur || ''
       });
 
       setSelectedFiles([]);
@@ -500,7 +501,7 @@ const Clients = () => {
         statut: "",
         notes: "",
         payement: "",
-        user_username_createur: '',
+        user_username_createur:""
       };
 
       setFormData(initialFormState);
