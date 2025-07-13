@@ -141,8 +141,6 @@ const Historique = ({ setIsAuthenticated }: any) => {
       const selectedPermissions = Object.keys(permissions)
         .filter(key => permissions[key as keyof typeof permissions]);
 
-      console.log('Permissions sélectionnées:', selectedPermissions);
-
       const userData = {
         username: userName,
         email: email,

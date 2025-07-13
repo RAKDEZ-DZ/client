@@ -160,16 +160,13 @@ const Clients = () => {
         Object.entries(formData).forEach(([key, value]) => {
           if (value) {
             formDataToSend.append(key, value.toString());
-            console.log(`Ajout de ${key}:`, value);
           }
         });
 
         const utilisateur1 = user; 
         formDataToSend.append('user_username_createur', utilisateur1);
-        console.log('Ajout de utilisateur :', utilisateur1);
 
         if (selectedFiles.length > 0) {
-          console.log(`Ajout de ${selectedFiles.length} fichiers`);
           selectedFiles.forEach((file) => {
             formDataToSend.append('documents', file);
             console.log(`Fichier ajouté:`, file.name, file.type, file.size);
@@ -236,10 +233,8 @@ const Clients = () => {
       });
 
       if (response.data) {
-        console.log(`Nombre de clients récupérés (json): ${response.data}`);
-        console.table(response.data); 
+        // console.table(response.data); 
         if (Array.isArray(response.data)) {
-          console.log(`Nombre de clients récupérés ;;;;;;;;;;;;;;;;;;;: ${response.data}`);
           setClients(response.data);
         } else if (typeof response.data === 'object') {
           // Si c'est un objet mais pas un tableau, vérifier s'il contient une propriété qui pourrait contenir les clients
@@ -247,7 +242,6 @@ const Clients = () => {
           const arrayKey = possibleArrayKeys.find(key => Array.isArray(response.data[key]));
 
           if (arrayKey) {
-            console.log(`Clients trouvés dans la propriété "${arrayKey}": ${response.data[arrayKey].length} éléments`);
             setClients(response.data[arrayKey]);
           } else {
             console.warn('Les données ne sont pas un tableau mais un objet:', response.data);
@@ -287,10 +281,6 @@ const Clients = () => {
   const getClientById = async (id: number) => {
     try {
       setLoading(true);
-      console.log(`Récupération du client avec l'ID: ${id}`);
-
-      console.log('URL de la requête de récupération: /api/clients/' + id);
-
       const response = await apiClient.get(`/api/clients/${id}`);
 
       // Vérifier si la réponse est dans le format attendu
@@ -304,8 +294,6 @@ const Clients = () => {
       } else {
         throw new Error('Format de réponse inattendu');
       }
-
-      console.log('Données du client reçues:', clientData);
 
       if (!clientData) {
         console.error('Aucune donnée client reçue');
@@ -471,9 +459,9 @@ const Clients = () => {
 
       Array.from(formDataToSend.entries()).forEach(([key, value]) => {
         if (value instanceof File) {
-          console.log(`Fichier [${key}]:`, (value as File).name);
+          // console.log(`Fichier [${key}]:`, (value as File).name);
         } else {
-          console.log(`Champ [${key}]:`, value);
+          // console.log(`Champ [${key}]:`, value);
         }
       });
       console.groupEnd();
@@ -600,7 +588,6 @@ const Clients = () => {
       });
 
       setClients(response.data.data);
-      console.log('Résultats de la recherche:', response.data);
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);
       seterrorsApi('Erreur lors de la recherche de clients. Veuillez réessayer.');
@@ -617,7 +604,6 @@ const Clients = () => {
       const fileTarget = target as HTMLInputElement;
       const fileList = fileTarget.files ? Array.from(fileTarget.files) : [];
       setSelectedFiles(fileList);
-      console.log("📁 Fichiers sélectionnés :", fileList); 
 
     } else if (type === "checkbox") {
       const checkboxTarget = target as HTMLInputElement;
@@ -678,7 +664,6 @@ const Clients = () => {
 
 
   const showClientDetails = (client: ClientType) => {
-    console.log('Affichage des détails du client:', client);
     setSelectedClient(client);
     setShowDetailModal(true);
   };
@@ -814,7 +799,6 @@ const Clients = () => {
         }
       );
   
-      console.log("Upload réussi :", response.data);
       setuploaded(false);
     } catch (error: any) {
       console.error("Erreur lors de l'upload :", error.response?.data || error.message);
@@ -865,7 +849,6 @@ const Clients = () => {
     if (storeRole) {
       const parsed = JSON.parse(storeRole);
       setrole(parsed.role);
-      console.log("hhhhhhhhhhhhhhhhhhh" , parsed.role)
     }
 
     if (storedName) {
@@ -1067,7 +1050,6 @@ const Clients = () => {
                                 className="btn btn-sm btn-danger"
                                 onClick={() => {
                                   if (client.id) {
-                                    console.log('Demande de suppression du client avec ID:', client.id);
                                     setIdToDelete(client.id);
                                     setShowModalVerify(true);
                                   }

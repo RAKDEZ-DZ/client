@@ -19,9 +19,6 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
   const { canViewPage, isAdmin, permissions, loaded } = usePermissions();
 
   useEffect(() => {
-    // Afficher les permissions chargées pour débogage
-    console.log('Navbar - Permissions chargées:', { isAdmin, permissions, loaded });
-    
     // Journaliser les permissions pour chaque page
     const pages = ['clients', 'dossiers_voyage', 'factures', 'users'];
     pages.forEach(page => {
@@ -38,7 +35,6 @@ const Navbar: React.FC<NavbarProps> = ({ ActiveComponents, setActiveComponents, 
     e.preventDefault();
     setShowModalVerify(false);
     setActiveComponents("devis");
-    console.log("Formulaire vérifié");
   };
   
   const handleLogout = () => {
