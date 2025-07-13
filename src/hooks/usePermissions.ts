@@ -37,21 +37,15 @@ export function usePermissions() {
     // Charger les permissions depuis le localStorage
     const loadPermissions = () => {
       try {
-        console.log('Chargement des permissions depuis localStorage...');
-        
         const permissionsStr = localStorage.getItem('userPermissions');
-        console.log('Raw permissions string from localStorage:', permissionsStr);
         
         if (permissionsStr) {
           try {
             const userPerms = JSON.parse(permissionsStr) as UserPermissions;
-            console.log('Permissions parsed from localStorage:', userPerms);
             
             if (userPerms && userPerms.permissions) {
               setPermissionsMap(userPerms.permissions);
               setRole(userPerms.role || '');
-              console.log('Permissions chargées avec succès:', userPerms.permissions);
-              console.log('Role défini:', userPerms.role);
             } else {
               console.warn('Format de permissions invalide ou manquant:', userPerms);
             }
@@ -66,13 +60,9 @@ export function usePermissions() {
         const userStr = localStorage.getItem('user');
         if (userStr) {
           try {
-            const user = JSON.parse(userStr);
-            console.log('User info from localStorage:', user);
-            
+            const user = JSON.parse(userStr);            
             if (!role && user?.role) {
-              setRole(user.role);
-              console.log('Role défini depuis user:', user.role);
-            }
+              setRole(user.role);            }
           } catch (parseError) {
             console.error('Erreur de parsing JSON user:', parseError);
           }
@@ -83,7 +73,6 @@ export function usePermissions() {
         console.error('Erreur lors du chargement des permissions:', error);
       } finally {
         setLoaded(true);
-        console.log('État final des permissions:', { role, permissionsMap, loaded: true });
       }
     };
 
@@ -94,18 +83,16 @@ export function usePermissions() {
   const canViewPage = (pageName: string): boolean => {
     // Les admins ont accès à tout
     if (role === 'admin') {
-      console.log(`Accès accordé à ${pageName} car l'utilisateur est admin`);
       return true;
     }
     
     // Pour les utilisateurs normaux, vérifier les permissions
     const pagePermission = permissionsMap[pageName];
     const hasAccess = pagePermission ? pagePermission.can_view : false;
-    
-    console.log(`Vérification d'accès à ${pageName}: ${hasAccess}`, { 
-      pagePermission, 
-      permissionsMap 
-    });
+    // console.log(`Vérification d'accès à ${pageName}: ${hasAccess}`, { 
+    //   pagePermission, 
+    //   permissionsMap 
+    // });
     
     return hasAccess;
   };

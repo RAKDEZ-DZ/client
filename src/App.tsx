@@ -22,25 +22,20 @@ function App() {
     // Vérifier l'authenticité du token au chargement
     const verifyToken = async () => {
       try {
-        console.log('Vérification du token...');
         const isValidToken = await checkAuthToken();
         
         if (!isValidToken) {
-          console.log('Token invalide ou inexistant');
           setIsAuthenticated(false);
           setLoading(false);
           return;
         }
         
-        console.log('Token valide, récupération des permissions...');
         // Récupérer les permissions si le token est valide
         const permissions = await getUserPermissions();
-        console.log('Permissions récupérées:', permissions);
         
         // Authentifier l'utilisateur même si aucune permission n'est définie
         setIsAuthenticated(true);
       } catch (error) {
-        console.error('Erreur lors de la vérification du token:', error);
         localStorage.removeItem('authToken');
         setIsAuthenticated(false);
       } finally {

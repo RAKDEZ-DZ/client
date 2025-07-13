@@ -29,7 +29,6 @@ API.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log('Requête API:', config.method?.toUpperCase(), config.url, 'Headers:', config.headers);
   return config;
 }, (error) => {
   console.error('Erreur dans l\'intercepteur de requête:', error);
@@ -39,12 +38,8 @@ API.interceptors.request.use((config) => {
 // Intercepteur pour la gestion des réponses
 API.interceptors.response.use(
   (response) => {
-    console.log('Réponse API:', response.status, response.config.url);
-    console.log('Type de données reçues:', typeof response.data);
     if (Array.isArray(response.data)) {
-      console.log('Nombre d\'éléments reçus:', response.data.length);
       if (response.data.length > 0) {
-        console.log('Premier élément:', response.data[0]);
       }
     }
     return response;
@@ -162,7 +157,6 @@ const Voyages = () => {
     if (!travelFormData.motif_voyage) newErrors.motif_voyage = 'Motif du voyage requis';
     // if (!travelFormData.prix_total) newErrors.prix_total = "Prix total requis";
 
-    console.log('Erreurs de validation:', newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -209,7 +203,6 @@ const Voyages = () => {
 
           setVoyages(safeVoyages);
           setFilteredVoyages(safeVoyages); // Initialiser les voyages filtrés
-          console.log(`${safeVoyages.length} voyages chargés avec succès`);
         } catch (error) {
           console.error('Erreur lors du traitement des données de voyage:', error);
           setVoyages([]);
@@ -332,7 +325,6 @@ const Voyages = () => {
   // Récupérer un voyage par ID
   const getVoyageById = async (id: number) => {
     try {
-      console.log(`Récupération du voyage avec l'ID: ${id}`);
       setErrorsApi('');
 
       const response = await API.get(`/api/dossiers-voyage/${id}`);
@@ -351,8 +343,6 @@ const Voyages = () => {
           setErrorsApi('Structure de données invalide reçue de l\'API');
           return;
         }
-
-        console.log('Données du voyage reçues:', voyageData);
 
         if (!voyageData || !voyageData.id) {
           console.error('Aucune donnée de voyage valide reçue');
@@ -390,7 +380,6 @@ const Voyages = () => {
           notes: safeVoyageData.notes || ''
         });
 
-        console.log('Voyage récupéré avec succès:', safeVoyageData);
       } else {
         console.error('Réponse API inattendue:', response);
         setErrorsApi('Erreur lors de la récupération du voyage: Réponse API invalide');
@@ -534,7 +523,6 @@ const Voyages = () => {
     }
 
     setFilteredVoyages(results);
-    console.log(`Recherche: ${results.length} résultats trouvés`);
   };
 
   // Réinitialiser tous les filtres
@@ -605,8 +593,6 @@ const Voyages = () => {
       ...prev,
       reste_a_payer: reste
     }));
-
-    console.log('Calcul reste à payer:', { prix, acompte, reste });
   };
 
   // Effet pour calculer automatiquement le reste à payer
@@ -697,7 +683,7 @@ const Voyages = () => {
     try {
       const response = await API.get('/api/clients', {
         params: {
-          limit: 1000  // On récupère un grand nombre de clients pour le dropdown
+          limit: 10000  
         }
       });
 
@@ -716,7 +702,6 @@ const Voyages = () => {
       });
 
       setClients(clientsData);
-      console.log(`${clientsData.length} clients chargés avec succès`);
     } catch (error) {
       console.error('Erreur lors du chargement des clients:', error);
       // On n'affiche pas d'erreur à l'utilisateur pour ne pas bloquer le processus principal

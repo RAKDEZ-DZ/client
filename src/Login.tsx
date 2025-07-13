@@ -39,16 +39,12 @@ export const getUserPermissions = async () => {
 
     const response = await API.get('/api/permissions/my-permissions', { headers });
     if (response.data && response.data.success) {
-      console.log('Permissions récupérées (brut):', response.data);
-      console.log('Permissions data structure:', response.data.data);
       
       if (!response.data.data || !response.data.data.permissions) {
-        console.error('Format de permissions invalide:', response.data.data);
         return null;
       }
       
       localStorage.setItem('userPermissions', JSON.stringify(response.data.data));
-      console.log('Permissions sauvegardées dans localStorage:', JSON.stringify(response.data.data));
       
       return response.data.data;
     }
@@ -74,14 +70,11 @@ export default function Login({setIsAuthenticated}: any) {
       setError('');
       
       try {
-        console.log('Tentative de connexion avec:', { email });
         const response = await API.post('/api/auth/login', {
           email,
           password
         });
-        
-        console.log('Réponse complète du serveur:', response);
-        
+                
         if (response.data && response.data.data && response.data.data.token) {
           if (localStorage.getItem('authToken')) {
            return alert('Vous allez être déconnecté(e) de la session précédente.');
@@ -97,7 +90,6 @@ export default function Login({setIsAuthenticated}: any) {
           
           try {
             const permissions = await getUserPermissions();
-            console.log('Permissions récupérées après login:', permissions);
             
             if (!permissions) {
               console.warn('Aucune permission récupérée ou format incorrect');
@@ -105,8 +97,6 @@ export default function Login({setIsAuthenticated}: any) {
             
             setIsAuthenticated(true);
           } catch (permError) {
-            console.error('Erreur lors de la récupération des permissions:', permError);
-            console.log('Authentification réussie (malgré erreur permissions):', response.data);
             setIsAuthenticated(true);
           }
         } else {
@@ -117,7 +107,6 @@ export default function Login({setIsAuthenticated}: any) {
         console.error('Erreur d\'authentification:', err);
         
         if (err.response) {
-          console.log('Détails de l\'erreur:', err.response.data);
           if (err.response.status === 401) {
             setError('Email ou mot de passe incorrect');
           } else if (err.response.data && err.response.data.message) {

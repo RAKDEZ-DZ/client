@@ -64,6 +64,7 @@ export interface ClientType {
   statut?: string;
   notes?: string;
   payement?: string;
+  user_username_createur?: string;
   documents?: Array<{
     name?: string;
     originalName?: string;
@@ -94,6 +95,7 @@ interface FormData {
   statut: string;
   notes: string;
   payement: string;
+  user_username_createur: string;
 };
 
 const Clients = () => {
@@ -113,7 +115,8 @@ const Clients = () => {
     niveau_etude: '',
     statut: '',
     notes: '',
-    payement: ''
+    payement: '',
+    user_username_createur:''
   });
   const [clients, setClients] = useState<ClientType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -163,7 +166,7 @@ const Clients = () => {
 
         const utilisateur = "admin@example.com"; 
         const utilisateur1 = user; 
-        formDataToSend.append('utilisateur', utilisateur);
+        formDataToSend.append('user_username_createur', utilisateur1);
         console.log('Ajout de utilisateur :', utilisateur);
 
         if (selectedFiles.length > 0) {
@@ -198,7 +201,8 @@ const Clients = () => {
           niveau_etude: '',
           statut: '',
           notes: '',
-          payement: ''
+          payement: '',
+          user_username_createur:''
         });
         setSelectedFiles([]);
 
@@ -938,7 +942,7 @@ const Clients = () => {
                     <th>Documents</th>
                     <th>Paiement</th>
                     <th>Action</th>
-                    <th>utilisateur</th>
+                    { role === "admin" && <th>utilisateur</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -1072,6 +1076,10 @@ const Clients = () => {
                               </button>
                             </div>
                           </td>
+                          {
+                            role === "admin" && <td>{client.user_username_createur}</td>
+                          }
+                          
                         </tr>
                       ))
                     ) : (

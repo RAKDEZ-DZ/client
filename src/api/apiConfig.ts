@@ -82,7 +82,6 @@ apiClient.interceptors.response.use(
 export const testApiConnection = async () => {
   try {
     const response = await apiClient.get('/', { timeout: 5000 });
-    console.log('Connexion à l\'API réussie:', response.data);
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error('Erreur de connexion à l\'API:', error);

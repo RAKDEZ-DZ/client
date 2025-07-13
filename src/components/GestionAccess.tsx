@@ -211,7 +211,6 @@ const GestionAccess = ({ setIsAuthenticated }: any) => {
       
       const formattedPermissions = Object.keys(permissionsByPage);
       
-      console.log('Permissions formatées:', formattedPermissions);
       
       // Créer l'utilisateur avec les permissions formatées correctement
       const response = await apiClient.post('/api/users', { 
@@ -517,7 +516,6 @@ const GestionAccess = ({ setIsAuthenticated }: any) => {
                           const updatedPermissions = { ...newUserPermissions };
                           updatedPermissions[`${page.id}-view`] = e.target.checked;
                           setNewUserPermissions(updatedPermissions);
-                          console.log('Permissions mises à jour:', updatedPermissions);
                         }}
                       />
                       <label className="form-check-label" htmlFor={`permission-view-${page.id}`}>

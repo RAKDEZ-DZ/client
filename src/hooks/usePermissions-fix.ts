@@ -40,7 +40,6 @@ export function usePermissions() {
             if (userPerms && userPerms.permissions) {
               setPermissionsMap(userPerms.permissions);
               setRole(userPerms.role || '');
-              console.log('Permissions chargées:', userPerms);
             }
           } catch (parseError) {
             console.error('Erreur de parsing JSON des permissions:', parseError);

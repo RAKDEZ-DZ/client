@@ -44,7 +44,6 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, onClose }
   const openDocument = (url: string | undefined) => {
     if (url) {
       const fullUrl = getDocumentUrl(url);
-      console.log('Ouverture du document:', fullUrl);
       
       // Créer un nouvel onglet avec une page vide
       const newWindow = window.open('', '_blank');
@@ -125,20 +124,14 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, onClose }
       // Générer un nom de fichier par défaut
       filename = `document-${Date.now()}`;
     }
-    
-    console.log('Document analysé:', { doc, filename, docId });
-    
+        
     // Créer l'URL pour l'API de documents avec notre nouvelle route de téléchargement
     const url = client && client.id && docId
       ? `/api/clients/${client.id}/documents/${docId}/download`
       : '';
     
-    console.log('Document info:', { displayName, filename, url });
     return { name: displayName, url };
   };
-
-  // Déboguer les documents
-  console.log('Documents du client:', client.documents);
   
   // Fonction pour formater l'URL du document
   const getDocumentUrl = (url: string | undefined) => {
@@ -155,7 +148,6 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({ client, onClose }
     // L'URL est relative à l'API, construire l'URL complète
     const formattedUrl = `${baseUrl}${url}`;
     
-    console.log('URL formatée pour téléchargement (ClientDetailModal):', formattedUrl);
     return formattedUrl;
   };
 

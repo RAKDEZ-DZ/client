@@ -42,7 +42,6 @@ const Historique = ({ setIsAuthenticated }: any) => {
       // Test simple pour vérifier si l'API est accessible
       const response = await apiClient.get('/api/users/permissions');
 
-      console.log('Connexion à l\'API réussie:', response.data);
       setApiStatus('connected');
       return true;
     } catch (err: any) {
@@ -154,15 +153,15 @@ const Historique = ({ setIsAuthenticated }: any) => {
       };
 
       // Vérifier le format des permissions avant envoi
-      console.log('Envoi de données utilisateur:', {
-        ...userData,
-        password: '******',
-        permissions: {
-          type: typeof selectedPermissions,
-          isArray: Array.isArray(selectedPermissions),
-          value: selectedPermissions
-        }
-      });
+      // console.log('Envoi de données utilisateur:', {
+      //   ...userData,
+      //   password: '******',
+      //   permissions: {
+      //     type: typeof selectedPermissions,
+      //     isArray: Array.isArray(selectedPermissions),
+      //     value: selectedPermissions
+      //   }
+      // });
 
       // Appel à l'API pour créer l'utilisateur
       const response = await apiClient.post(
@@ -170,7 +169,6 @@ const Historique = ({ setIsAuthenticated }: any) => {
         userData
       );
 
-      console.log('Réponse du serveur:', response.data);
 
       if (response.data && response.data.success) {
         // Message de succès avec les détails de l'utilisateur créé

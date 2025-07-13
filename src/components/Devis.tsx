@@ -130,9 +130,7 @@ const Devis = () => {
         setLoading(false);
         return;
       }
-      
-      console.log('Récupération des factures, page:', currentPage);
-      
+            
       // Utilisation du client API configuré pour communiquer avec le backend
       const response = await apiClient.get('/api/factures', {
         params: {
@@ -140,8 +138,6 @@ const Devis = () => {
           limit: 10
         }
       });
-
-      console.log('Réponse de l\'API factures:', response.data);
 
       // Vérification de la réponse
       if (response.data && response.data.success) {
@@ -209,7 +205,6 @@ const Devis = () => {
   // Charger la liste des clients depuis l'API
   const loadClients = async () => {
     try {
-      console.log('Chargement de la liste des clients...');
       const response = await apiClient.get('/api/clients', {
         params: {
           limit: 1000  // On récupère un grand nombre de clients pour le dropdown
@@ -231,7 +226,6 @@ const Devis = () => {
       });
       
       setClients(clientsData);
-      console.log(`${clientsData.length} clients chargés avec succès`);
     } catch (error) {
       console.error('Erreur lors du chargement des clients:', error);
       // On n'affiche pas d'erreur à l'utilisateur pour ne pas bloquer le processus principal
@@ -262,7 +256,6 @@ const Devis = () => {
     } 
     // En cas d'erreur ou pas de données, utiliser les données de test
     else if (error) {
-      console.log('Utilisation des données de test car erreur API:', error);
       // return testFactures.map(facture => ({
       //   id: facture.numero_facture,
       //   nomPrenom: `${facture.nom} ${facture.prenom}`,
@@ -479,9 +472,6 @@ const Devis = () => {
                           somme: montantPaye + montantRestant
                         });
                       }
-                      
-                      // Afficher les données à modifier dans la console pour débogage
-                      console.log('Facture à modifier:', item.facture);
                     }}
                     data-bs-toggle="modal"
                     data-bs-target="#modalEditeDevis"
@@ -809,7 +799,6 @@ const Devis = () => {
         });
         // Recalculer le montant restant pour s'assurer de la cohérence
         const resteCorrige = Math.max(0, montantTotal - montantPaye);
-        console.log('Montant restant corrigé:', resteCorrige);
       }
       
       // Préparer toutes les données à mettre à jour
@@ -821,9 +810,7 @@ const Devis = () => {
         description: selectedItem?.facture?.description,
         conditions_paiement: selectedItem?.facture?.conditions_paiement
       };
-      
-      console.log('Données envoyées pour mise à jour:', updatedData);
-      const response = await apiClient.put(`/api/factures/${IdToUpdate}`, updatedData);
+            const response = await apiClient.put(`/api/factures/${IdToUpdate}`, updatedData);
 
       if (response.data.success) {
         // Rafraîchir la liste après mise à jour

@@ -19,7 +19,6 @@ API.interceptors.request.use(
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('Token ajouté aux en-têtes:', token.substring(0, 15) + '...');
     } else {
       console.warn('Aucun token trouvé dans localStorage');
     }
@@ -204,16 +203,12 @@ const Dashboard = () => {
                   'Authorization': `Bearer ${token}`
                 }
               });
-              console.log('Documents téléchargés avec succès');
             } catch (uploadError: any) {
               console.error('Erreur lors du téléchargement des documents:', uploadError);
               // Ne pas bloquer le processus si le téléchargement de documents échoue
             }
           }
-        }
-
-        console.log('Client ajouté avec succès:', response.data);
-        
+        }        
         // Réinitialiser le formulaire
         setFormData({
           name: '',
@@ -297,8 +292,6 @@ const Dashboard = () => {
 
         // Requête API pour créer un nouveau dossier de voyage
         const response = await API.post('/api/dossiers-voyage', voyageData);
-
-        console.log('Voyage ajouté avec succès:', response.data);
         
         // Afficher un message de succès temporaire
         setRefreshSuccess(true);
@@ -511,7 +504,6 @@ const Dashboard = () => {
       
       if (response.data && response.data.token) {
         localStorage.setItem('authToken', response.data.token);
-        console.log('Token rafraîchi avec succès');
         return true;
       }
       return false;
@@ -532,18 +524,14 @@ const Dashboard = () => {
         setLoading(false);
         return;
       }
-      
-      console.log('Récupération des données avec le token:', token.substring(0, 15) + '...');
-      
+            
       // Récupération des clients
       const clientsResponse = await API.get('/api/clients');
-      console.log('Réponse clients complète:', clientsResponse.data);
       
       // Extraction des données clients selon la structure de réponse du backend
       let clientsData = [];
       if (clientsResponse.data && clientsResponse.data.success && Array.isArray(clientsResponse.data.data)) {
         clientsData = clientsResponse.data.data;
-        console.log('Clients trouvés:', clientsData.length);
       } else {
         console.warn('Format de réponse clients inattendu:', clientsResponse.data);
       }
@@ -552,13 +540,11 @@ const Dashboard = () => {
       
       // Récupération des dossiers de voyage
       const voyagesResponse = await API.get('/api/dossiers-voyage');
-      console.log('Réponse voyages complète:', voyagesResponse.data);
       
       // Extraction des données voyages selon la structure de réponse du backend
       let voyagesData = [];
       if (voyagesResponse.data && voyagesResponse.data.success && Array.isArray(voyagesResponse.data.data)) {
         voyagesData = voyagesResponse.data.data;
-        console.log('Voyages trouvés:', voyagesData.length);
       } else {
         console.warn('Format de réponse voyages inattendu:', voyagesResponse.data);
       }
@@ -583,9 +569,7 @@ const Dashboard = () => {
       setTimeout(() => {
         setRefreshSuccess(false);
       }, 3000);
-      
-      console.log('Données récupérées avec succès:', { clients: clientsData.length, voyages: voyagesData.length });
-      
+            
     } catch (error: any) {
       console.error('Erreur lors de la récupération des données:', error);
       
