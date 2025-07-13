@@ -1361,7 +1361,6 @@ const Clients = () => {
                     multiple
                     className="form-control"
                     onChange={handleInputChange}
-                    required
                   />
                   {/* <button className='btn btn-outline-success' type="button" onClick={() => UploadDocuments()}>
                     {uploaded ? " ... " : " Stocker"}
